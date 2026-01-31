@@ -93,7 +93,7 @@
     border: none;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: 1.1rem;
     letter-spacing: 0.5px;
     padding: 15px;
   }
@@ -241,8 +241,9 @@
                   >
                     No Surat
                   </th>
-                  <th width="20%">Detail Surat</th>
-                  <th width="40%">Perihal & Lampiran</th>
+                  <th width="15%" class="text-center">Tanggal Surat</th>
+                  <th width="20%">Perihal</th>
+                  <th width="20%" class="text-center">Lampiran</th>
                   <th class="text-center" width="20%">Unit</th>
                   <th
                     class="text-center"
@@ -258,58 +259,36 @@
                 {loop: $tabel_suratusulan}
                 <tr>
                   <td
-                    class="text-center font-weight-bold"
-                    style="padding-top: 20px"
+                    class="text-left font-weight-bold"
+                    data-order="{$value.id_surat}"
                   >
-                    {$key + 1}
+                    {$value.no_surat}
                   </td>
-                  <td>
-                    <div
+                  <td class="text-left">
+                    <div class="text-left"
                       style="
                         font-weight: 700;
                         color: #333;
                         margin-bottom: 5px;
                         display: flex;
                         align-items: center;
-                        gap: 6px;
+                        gap: 8px;
                       "
                     >
                       <i class="fa fa-calendar text-primary"></i>
-                      {$value.tgl_surat}
-                    </div>
-                    <div
-                      class="text-muted small"
-                      style="line-height: 1.3; font-style: italic"
-                    >
-                      {$value.no_surat}
+                      {?=dateIndonesia($value['tgl_surat'])?}
                     </div>
                   </td>
                   <td>
                     <div style="margin-bottom: 12px">
-                      <strong
-                        style="
-                          font-size: 0.8em;
-                          color: #0056b3;
-                          letter-spacing: 0.5px;
-                          text-transform: uppercase;
-                        "
-                        >Perihal</strong
-                      >
-                      <div class="cell-text-limit" title="{$value.perihal}">
+                      <div class="text-center font-weight-bold" title="{$value.perihal}">
                         {$value.perihal}
                       </div>
                     </div>
-                    <div>
-                      <strong
-                        style="
-                          font-size: 0.8em;
-                          color: #0056b3;
-                          letter-spacing: 0.5px;
-                          text-transform: uppercase;
-                        "
-                        >Lampiran</strong
-                      >
-                      <div class="cell-text-limit" title="{$value.lampiran}">
+                  </td>
+                  <td class="text-center">
+                    <div style="margin-bottom: 12px">
+                      <div class="text-center font-weight-bold" title="{$value.lampiran}">
                         {$value.lampiran}
                       </div>
                     </div>
@@ -333,6 +312,7 @@
                     <div style="display: flex; justify-content: center">
                       <a
                         href="{?= url([ADMIN, 'hosplan', 'cetaksuratusulan', $value['id_surat']])?}"
+                        target="_blank"
                         class="btn-icon-action bg-gradient-info"
                         title="Cetak"
                         ><i class="fa fa-print"></i

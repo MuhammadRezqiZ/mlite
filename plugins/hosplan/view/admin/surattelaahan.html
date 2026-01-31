@@ -99,7 +99,7 @@
     border: none;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: 1.1rem;
     letter-spacing: 0.5px;
     padding: 15px;
   }
@@ -157,7 +157,7 @@
           class="col-xs-9 text-right"
           style="font-size: 16px; margin-top: 20px"
         >
-          <div class="huge" id="kas-masuk">0</div>
+          <div class="huge" id="telaahan-count">0</div>
           <div>Jumlah Surat Telaahan</div>
         </div>
       </div>
@@ -881,7 +881,7 @@
       if (!table) return;
       // Gunakan count() agar menghitung jumlah baris hasil filter secara akurat
       var rowCount = table.rows({ search: "applied" }).count();
-      var $counter = $("#telaahan-countkas-masuk");
+      var $counter = $("#telaahan-count");
       if ($counter.length) {
         $counter.text(rowCount);
       }

@@ -293,11 +293,12 @@ class Admin extends AdminModule
           }
       }
     
-      return $this->draw('cetaksuratusulan.html', [
+      echo $this->draw('cetaksuratusulan.html', [
           'suratusulan' => $suratusulan[0],
           'unit'  => $unit,
           'ttd_files' => $ttd_files
       ]);
+      exit();
     }
 
     public function getCetakSuratTelaahan($id_surat)
