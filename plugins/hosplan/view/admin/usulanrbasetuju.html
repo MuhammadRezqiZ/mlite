@@ -1,0 +1,449 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style media="screen">
+  .modern-stat-card {
+    border-radius: 12px;
+    padding: 15px;
+    color:white;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .modern-stat-card.upload {
+    background: linear-gradient(135deg, #4CAF50 0%, #338937 100%);
+  }
+  
+  .modern-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+  }
+  
+  .modern-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .highlight-new {
+    background-color: #e8ffe8 !important;
+    transition: background-color 2s ease-in-out;
+  }
+  /* Pastikan Select2 melebar mengikuti container */
+  .select2-container { width: 100% !important; }
+  .btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#ff4d4f 0%,#d9363e 100%);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-back:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+    filter:brightness(1.05);
+    color:#fff;
+  }
+</style>
+
+<div class="back" style="margin-bottom: 20px; text-align: right;">
+  <a href="{?=url([ADMIN, 'hosplan', 'arsipsetuju'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
+</div>
+
+<div class="col-lg-3 col-md-6" style="margin-bottom: 40px;">
+        <div class="modern-stat-card upload">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-clipboard fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
+                        <div class="huge" id="kas-masuk">{?=$jumlahRBASetuju?}</div>
+                        <div>Jumlah Usulan RBA Disetujui</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total Usulan RBA yang Disetujui terkini</span>
+                <span class="pull-right"><i class="fa fa-clipboard"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+<div class="row" style="margin-bottom: 20px;">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="font-size: large; ">
+                <i class="fa fa-clipboard"></i> &nbsp; <b>Data Usulan RBA yang Disetujui RSUD H. Damanhuri Barabai</b>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                  <!-- Filter Unit -->
+                  <style>
+                    .filter-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.06);margin-bottom:12px}
+                    .filter-row{display:flex;align-items:center;gap:12px}
+                    .filter-select{flex:1 1 auto;min-width:280px}
+                    .btn-pilih{background:#111;color:#fff;border-color:#111}
+                    .btn-pilih:hover{background:#000;color:#fff}
+                  </style>
+                  <style>
+                    /* Badge untuk kolom Status */
+                    .status-badge{
+                      display:inline-block;
+                      padding:4px 10px;
+                      border-radius:9999px;
+                      font-size:12px;
+                      font-weight:600;
+                      color:#fff;
+                      background:#6b7280; /* default grey */
+                    }
+                    .status-badge[data-status="Diajukan"]{background:#0ea5e9} /* sky-500 */
+                    .status-badge[data-status="Disetujui"],
+                    .status-badge[data-status="Dikonfirmasi"],
+                    .status-badge[data-status="Selesai"]{background:#22c55e} /* green-500 */
+                    .status-badge[data-status="Ditolak"],
+                    .status-badge[data-status="Batal"]{background:#ef4444} /* red-500 */
+                    /* Pastikan modal tidak transparan */
+                    .modal-content{background:#ffffff !important; color:#111827; border-radius:6px; box-shadow:0 10px 25px rgba(0,0,0,.15)}
+                    .modal-header{background:#ffffff; border-bottom:1px solid #e5e7eb}
+                    .modal-footer{background:#ffffff; border-top:1px solid #e5e7eb}
+                    .modal-backdrop{background-color:#000000}
+                    .modal-backdrop.in{opacity:0.35}
+
+                    /* Modal modern */
+                    .modal-modern .modal-header{padding:14px 18px}
+                    .modal-modern .modal-title{font-size:18px;font-weight:700;color:#111827;margin:0}
+                    .modal-modern .modal-subtitle{font-size:13px;color:#6b7280;margin-top:4px}
+                    .modal-modern .modal-body{padding:16px 18px}
+                    .modal-modern .form-group{margin-bottom:14px}
+                    .modal-modern label{font-weight:600;color:#374151;margin-bottom:6px;display:block}
+                    .modal-modern .form-control{border:1px solid #e5e7eb;border-radius:8px;box-shadow:none}
+                    .modal-modern .form-control:focus{border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.2)}
+                    .btn-primary-modern{background:#0ea5e9;border-color:#0ea5e9;color:#fff;border-radius:8px;padding:8px 14px}
+                    .btn-primary-modern:hover{background:#0284c7;border-color:#0284c7;color:#fff}
+                    .btn-secondary-modern{background:#6b7280;border-color:#6b7280;color:#fff;border-radius:8px;padding:8px 14px}
+                    .btn-secondary-modern:hover{background:#4b5563;border-color:#4b5563;color:#fff}
+
+                    /* Modern UI palette */
+                    :root{
+                      --bg-soft:#f8fafc;
+                      --border-soft:#e5e7eb;
+                      --text-muted:#64748b;
+                      --primary:#0ea5e9;
+                      --success:#10b981;
+                      --warning:#f59e0b;
+                      --danger:#ef4444;
+                      --secondary:#6b7280;
+                    }
+
+                    /* Filter card modern */
+                    .filter-card{background:var(--bg-soft);border:1px solid var(--border-soft);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+                    .filter-row{display:flex;gap:10px;align-items:center}
+                    .filter-select{max-width:280px}
+                    .btn-pilih{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 12px}
+                    .btn-pilih:hover{filter:brightness(0.95)}
+
+                    /* Table modern */
+                    .table-modern thead th{background:#f1f5f9;color:#0f172a;border-bottom:1px solid var(--border-soft);font-weight:600}
+                    .table-modern tbody tr:hover{background:#f8fafc}
+                    .table-modern td,.table-modern th{vertical-align:middle}
+
+                    /* Status badge pills */
+                    .status-badge{display:inline-block;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;border:1px solid var(--border-soft)}
+                    .status-badge.status-diajukan{background:#e0f2fe;color:#0369a1;border-color:#bae6fd}
+                    .status-badge.status-disetujui{background:#dcfce7;color:#065f46;border-color:#bbf7d0}
+                    .status-badge.status-ditolak{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+
+                    /* Modal modern polish */
+                    .modal-modern{border-radius:14px;box-shadow:0 12px 40px rgba(2,8,23,.12)}
+                    .modal-modern .modal-header{border-bottom:1px solid var(--border-soft);background:linear-gradient(180deg,#f8fafc,#ffffff)}
+                    .modal-modern .modal-title{font-weight:700;color:#0f172a}
+                    .modal-subtitle{font-size:13px;color:var(--text-muted)}
+                    .modal-modern .form-control{border-radius:10px;border:1px solid var(--border-soft)}
+                  </style>
+                  <form id="formFilterPptk" action="{?= url([ADMIN, 'hosplan', 'konfirmasiusulanrba']) ?}" method="get" style="margin-bottom: 20px;">
+                    <div class="filter-card">
+                      <div class="filter-row">
+                        <label for="id_pptk" style="font-weight:600;margin:0;">Filter PPTK:</label>
+                        <select id="id_pptk" name="id_pptk" class="form-control filter-select">
+                          <option value="all" {if: $selectedPptk == 'all'}selected{/if}>Semua PPTK</option>
+                          {loop: $pptk}
+                            <option value="{$value.id_pptk}" {if: $selectedPptk == $value.id_pptk}selected{/if}>{$value.nama_pptk}</option>
+                          {/loop}
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-pilih"><i class="fa fa-check"></i> Pilih</button>
+                      </div>
+                      <input type="hidden" name="t" value="{?=$_GET['t']?}">
+                    </div>
+                  </form>
+
+                    <!-- <div style="margin-bottom:10px; font-weight:600;">Total data ditemukan: {?=$totalUploadRKA?}</div> -->
+                    <table id="tabelSuratUsulan" class="table table-striped table-hover table-modern" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;">Nomor Usulan</th>
+                                <th style="text-align: center;">Tanggal</th>
+                                <th style="text-align: center;">Pengirim</th>
+                                <th style="text-align: center;">Perihal</th>
+                                <th style="text-align: center;">Jenis</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Lampiran</th>
+                                <th style="text-align: center;">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data akan ditampilkan setelah filter unit dipilih -->
+                            {loop: $tabel_uploadusulanrba}
+                            <tr>
+                                <td>{$value.no_surat}</td>
+                                <td>{?= !empty($value['tanggal_usulan']) ? date('d-m-Y', strtotime($value['tanggal_usulan'])) : '-' ?}</td>
+                                <td>{$value.nama_unit}</td>
+                                <td>{$value.perihal}</td>
+                                <td>{$value.jenis_usulan}</td>
+                                <td>
+                                  <span class="status-badge" data-status="{$value.status_surat}">{$value.status_surat}</span>
+                                </td>
+                                <td>
+                                  {if: !empty($value.file_url)}
+                                    <a href="{?= url($value.file_url) ?}" target="_blank" rel="noopener noreferrer">{$value.file_usulan}</a>
+                                  {/if}
+                                  {if: empty($value.file_url)}-
+                                  {/if}
+                                </td>
+                                <td>{$value.keterangan}</td>
+                            </tr>
+                            {/loop}
+                        </tbody>
+                    </table>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+  // Aktifkan pencarian pada filter Unit
+  if ($.fn.select2) {
+    $('#id_pptk').select2({
+      placeholder: '-- Pilih Unit --',
+      allowClear: true,
+      width: '100%'
+    });
+  }
+
+  var table;
+  if ($.fn.dataTable.isDataTable('#tabelSuratUsulan')) {
+    table = $('#tabelSuratUsulan').DataTable();
+  } else {
+    table = $('#tabelSuratUsulan').DataTable({
+    "pageLength": 10, // default show 10 entries
+    "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+    "order": [[0, 'desc']], // tampilkan data terbaru (id terbesar) di atas
+    "language": {
+      "lengthMenu": "Tampilkan _MENU_ data per halaman",
+      "zeroRecords": "Tidak ada data untuk filter ini",
+      "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+      "infoEmpty": "Tidak ada data tersedia",
+      "infoFiltered": "(disaring dari total _MAX_ data)",
+      "search": "Cari:",
+      "paginate": {
+        "first": "Pertama",
+        "last": "Terakhir",
+        "next": "›",
+        "previous": "‹"
+      }
+    }
+  });
+  }
+
+  // Terapkan warna modern pada badge status berdasarkan nilai
+  function applyStatusBadgeStyles(){
+    $('.status-badge').each(function(){
+      var txt = ($(this).data('status') || $(this).text() || '').toString().toLowerCase();
+      var cls = '';
+      if (txt.indexOf('aju') !== -1) cls = 'status-diajukan';
+      else if (txt.indexOf('pro') !== -1) cls = 'status-diproses';
+      else if (txt.indexOf('set') !== -1 || txt.indexOf('approve') !== -1) cls = 'status-disetujui';
+      else if (txt.indexOf('tol') !== -1 || txt.indexOf('reject') !== -1) cls = 'status-ditolak';
+      else if (txt.indexOf('arsip') !== -1) cls = 'status-diarsipkan';
+      $(this).addClass(cls);
+    });
+  }
+  applyStatusBadgeStyles();
+
+  // Filter unit: tombol "Pilih" akan submit form; perubahan select tidak auto-submit
+  document.getElementById('checkAll').addEventListener('change', function() {
+        document.querySelectorAll('input[name="id_usulan[]"]').forEach(cb => cb.checked = this.checked);
+    });
+  // Validasi: pastikan ada checkbox terpilih sebelum submit ke cetakusulanrka.html
+  const formCetak = document.getElementById('formCetakUsulanRKA');
+  formCetak.addEventListener('submit', function(e) {
+    const checked = document.querySelectorAll('input[name="id_usulan[]"]:checked');
+    if (checked.length === 0) {
+      e.preventDefault();
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({ icon: 'warning', title: 'Pilih minimal satu data usulan RKA terlebih dahulu', timer: 2000, showConfirmButton: false });
+      } else {
+        alert('Pilih minimal satu data usulan RKA terlebih dahulu');
+      }
+    }
+  });
+  // Utility notifikasi dengan fallback jika SweetAlert2 tidak tersedia
+  function showNotification(type, message) {
+    var iconMap = { success: 'success', warning: 'warning', danger: 'error', error: 'error', info: 'info' };
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: iconMap[type] || 'info',
+        title: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+      });
+    } else {
+      // Fallback sederhana jika SweetAlert2 tidak termuat
+      alert(message);
+    }
+  }
+
+  // Tampilkan notifikasi berdasarkan parameter URL
+  const params = new URLSearchParams(window.location.search);
+  // Jika ada confirm_id pada URL, langsung buka modal konfirmasi berbasis ID
+  const confirmId = params.get('confirm_id');
+  if (confirmId) {
+    const btn = $("button[data-target='#confirmStatusModal'][data-id='" + confirmId + "']");
+    if (btn.length) {
+      // Prefill nilai modal dari data tombol
+      $('#id_usulan').val(confirmId);
+      $('#modalNoSurat').text(btn.data('no') || '');
+      $('#modalStatus').val(btn.data('status') || '');
+      $('#modalKet').val(btn.data('ket') || '');
+      // Tampilkan modal
+      $('#confirmStatusModal').modal('show');
+    } else {
+      // ID tidak ada pada halaman saat ini
+      showNotification('warning', 'ID usulan tidak ditemukan pada halaman ini');
+    }
+  }
+  if (params.get('added') === '1') {
+    showNotification('success', 'Data berhasil ditambahkan!');
+    // Sorot baris teratas sebagai indikasi data baru
+    const firstRow = $(table.row(0).node());
+    firstRow.addClass('highlight-new');
+    setTimeout(() => firstRow.removeClass('highlight-new'), 2500);
+  }
+  if (params.get('edited') === '1') {
+    showNotification('warning', 'Data berhasil diperbarui!');
+  }
+  if (params.get('deleted') === '1') {
+    showNotification('error', 'Data berhasil dihapus!');
+  }
+
+  // Hapus parameter notifikasi dari URL agar tidak muncul lagi saat refresh
+  if (params.has('added') || params.has('edited') || params.has('deleted')) {
+    params.delete('added');
+    params.delete('edited');
+    params.delete('deleted');
+    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    window.history.replaceState({}, '', newUrl);
+  }
+
+  // Fungsi untuk update jumlah usulan RKA
+  function updateRkaCount() {
+    if (!table) return;
+    // Gunakan count() agar menghitung jumlah baris hasil filter secara akurat
+    var rowCount = table.rows({ search: 'applied' }).count();
+    var $counter = $('#kas-masuk');
+    if ($counter.length) {
+      $counter.text(rowCount);
+    }
+  }
+
+  // Panggil fungsi saat tabel selesai diinisialisasi
+  updateRkaCount();
+  // Reapply badge styles setelah draw agar tetap konsisten
+  applyStatusBadgeStyles();
+
+  // Panggil fungsi setiap kali tabel digambar ulang (termasuk saat filtering, paginasi, atau search)
+  table.on('draw', function() {
+    updateRkaCount();
+    applyStatusBadgeStyles();
+  });
+
+  // Persist filter Unit agar tidak perlu memilih ulang setelah tambah/edit/hapus
+  (function persistUnitFilter(){
+    const storageKey = 'rka:selectedPptk';
+    const filterForm = document.getElementById('formFilterPptk');
+    const unitSelect = document.getElementById('id_pptk');
+    if (!filterForm || !unitSelect) return;
+
+    // Simpan pilihan saat tombol Pilih ditekan
+    filterForm.addEventListener('submit', function(){
+      try { localStorage.setItem(storageKey, unitSelect.value || ''); } catch(e) {}
+    });
+
+    // Jika halaman kembali tanpa parameter id_pptk, terapkan otomatis dari penyimpanan
+    const params = new URLSearchParams(window.location.search);
+    const hasParam = params.has('id_pptk') && params.get('id_pptk') !== '';
+    let saved = null;
+    try { saved = localStorage.getItem(storageKey); } catch(e) { saved = null; }
+    if (!hasParam && saved) {
+      if ($.fn.select2) {
+        $('#id_pptk').val(saved).trigger('change');
+      } else {
+        unitSelect.value = saved;
+      }
+      filterForm.submit();
+    }
+  })();
+
+  $('#tabelSuratUsulan').on('click', '.btn-hapus', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'Anda yakin?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  window.location.href = url;
+              }
+          });
+        } else {
+          // Fallback ke konfirmasi native
+          if (confirm('Yakin ingin menghapus usulan RKA ini?')) {
+            window.location.href = url;
+          }
+        }
+    });
+});
+
+</script>

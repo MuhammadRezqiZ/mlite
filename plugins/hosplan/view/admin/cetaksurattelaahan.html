@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cetak Surat Telaahan</title>
+    <style>
+      /* Base Styles */
+      body {
+        font-family: "Times New Roman", Times, serif;
+        background: #f4f6f9;
+      }
+
+      /* Print Area Styles */
+      .print-area {
+        width: 210mm; /* A4 width */
+        margin: 0 auto;
+        background: white;
+        padding: 5mm 15mm; /* Reduced padding */
+        box-sizing: border-box;
+        font-size: 12pt; /* Reduced for better fit */
+        line-height: 1.15; /* Tighter line height */
+        color: #000;
+        position: relative;
+      }
+
+      .btn-print {
+        background: #111827;
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      }
+      .btn-print:hover {
+        background: #1f2937;
+      }
+
+      /* Print Specific Styles */
+      @media print {
+        @page {
+          size: A4;
+          margin: 5mm 10mm;
+        }
+
+        /* Hide EVERYTHING by default */
+        body * {
+          visibility: hidden;
+        }
+
+        /* Hide known wrapper elements to be safe */
+        .no-print,
+        .sidebar,
+        .navbar,
+        .footer,
+        footer,
+        header,
+        .main-header,
+        .content-header {
+          display: none !important;
+        }
+
+        /* Reset Body */
+        body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
+
+        /* Show and Position Print Area */
+        .print-area,
+        .print-area * {
+          visibility: visible;
+        }
+
+        .print-area {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+        }
+
+        /* Remove link href display */
+        a[href]:after,
+        abbr[title]:after {
+          content: "" !important;
+        }
+      }
+
+      /* Compact Layout Helpers */
+      .kop {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 2px;
+        margin-bottom: 5px;
+        position: relative;
+        min-height: 80px; /* Ensure height for absolute logo */
+      }
+      .kop h3 {
+        margin: 0;
+        font-size: 16px;
+      } /* Compact headers */
+      .kop h4 {
+        margin: 0;
+        font-size: 18px;
+      } /* Compact headers */
+      .kop p {
+        margin: 0;
+        font-size: 12px;
+      }
+
+      .meta-table {
+        width: 100%;
+        margin-bottom: 5px;
+        border-collapse: collapse;
+      }
+      .meta-table td {
+        vertical-align: top;
+        padding: 0 2px; /* Reduced padding */
+      }
+      .meta-label {
+        width: 90px;
+        font-size: 11pt;
+      }
+      .meta-sep {
+        width: 10px;
+        text-align: center;
+      }
+
+      .section-row {
+        margin-top: 5px; /* Reduced from 10px */
+      }
+      .section-num {
+        width: 30px;
+        float: left;
+        font-weight: bold;
+        text-align: right;
+        padding-right: 10px;
+      }
+      .section-content {
+        margin-left: 40px;
+        text-align: justify;
+      }
+      .section-title {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 11pt;
+        margin-bottom: 1px;
+      }
+      .section-content p {
+        margin: 0;
+      }
+
+      .disposisi-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .disposisi-table th,
+      .disposisi-table td {
+        border: 1px solid #000;
+        padding: 2px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 12pt;
+      }
+      .disposisi-box {
+        height: 60px; /* Reduced height */
+      }
+
+      /* Modal Styles */
+      .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .custom-modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .close-modal {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .ttd-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .ttd-item {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .ttd-item:hover {
+        transform: scale(1.05);
+        border-color: #007bff;
+      }
+      .ttd-item img {
+        max-width: 150px;
+        max-height: 100px;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div class="back no-print" style="margin-bottom: 20px; text-align: center; padding: 20px;">
+      <button class="btn-print" onclick="window.print()">🖨️ Print / Simpan PDF</button>
+      <button class="btn-print" id="btn-sign" style="background-color: #28a745; margin-left: 5px" >✍️ TTD-Elektronik</button>
+    </div>
+
+    <div class="print-area">
+      <!-- KOP -->
+      <div class="kop" style="margin-top: 30px;"><img src="{?= url('/plugins/hosplan/img/hst.png') ?}" alt="Logo" style="position: absolute; left: 0; top: 0; width: 50px; height: 70px;" />
+        <h4><b>PEMERINTAH KABUPATEN HULU SUNGAI TENGAH</b></h4>
+        <h4><b>DINAS KESEHATAN</b></h4>
+        <h3><b>UPT RSUD H. DAMANHURI BARABAI</b></h3>
+        <p>Jalan Murakata Nomor 4 Barabai Barat Hulu Sungai Tengah Kalimantan Selatan 71314</p>
+        <p>Telp : 0811 5008080 Laman : www.rshdbarabai.com, Pos-el : rshd@hstkab.go.id</p>
+      </div>
+
+      <!-- TITLE -->
+      <div style="text-align: center;margin-top: 10px; margin-bottom: 10px">
+        <h4 style="text-decoration: underline;font-weight: bold;margin: 0;font-size: 14pt;">TELAAHAN STAF</h4>
+      </div>
+
+      <!-- METADATA -->
+      <table class="meta-table">
+        <tr>
+          <td class="meta-label">Kepada Yth</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;">Direktur/Pemimpin BLUD RSUD H. Damanhuri Barabai</td>
+        </tr>
+        <tr>
+          <td class="meta-label">Dari</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;">
+            Pejabat Pelaksana Teknis Kegiatan {$surattelaahan.nama_unit} RSUD H.
+            Damanhuri Barabai
+          </td>
+        </tr>
+        <tr>
+          <td class="meta-label">Nomor</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;">{$surattelaahan.no_surat}</td>
+        </tr>
+        <tr>
+          <td class="meta-label">Tanggal</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;">{?= dateIndonesia($surattelaahan['tgl_surat']) ?}</td>
+        </tr>
+        <tr>
+          <td class="meta-label">Perihal</td>
+          <td class="meta-sep">:</td>
+          <td style="font-weight: bold; font-style: italic; font-size: 11pt;">
+            {$surattelaahan.perihal}
+          </td>
+        </tr>
+        <tr>
+          <td
+            colspan="3"
+            style="border-bottom: 2px solid #000; height: 5px"
+          ></td>
+        </tr>
+      </table>
+
+      <!-- CONTENT SECTIONS -->
+      <div class="section-row">
+        <div class="section-num">I.</div>
+        <div class="section-content">
+          <div class="section-title">PERMASALAHAN</div>
+          <p>{$surattelaahan.permasalahan}</p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">II.</div>
+        <div class="section-content">
+          <div class="section-title">PRA ANGGAPAN</div>
+          <p>{$surattelaahan.pra_anggapan}</p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">III.</div>
+        <div class="section-content">
+          <div class="section-title">FAKTA-FAKTA</div>
+          <p>{$surattelaahan.fakta}</p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">IV.</div>
+        <div class="section-content">
+          <div class="section-title">PEMBAHASAN</div>
+          <p>{$surattelaahan.pembahasan}</p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">V.</div>
+        <div class="section-content">
+          <div class="section-title">SARAN TINDAK</div>
+          <p>{$surattelaahan.saran_tindakan}</p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">VI.</div>
+        <div class="section-content">
+          <div class="section-title">PENUTUP</div>
+          <p>{$surattelaahan.penutup}</p>
+        </div>
+      </div>
+
+      <!-- CLOSING -->
+      <div style="margin-left: 40px; margin-top: 5px">
+        Demikian disampaikan, mohon arahan dan persetujuan.
+      </div>
+
+      <!-- SIGNATURE -->
+      <div style="width: 100%; overflow: hidden; margin-top: 10px">
+        <div class="ttd" style="float: right; text-align: center; width: 280px">
+          <div style="font-size: 15px">Pejabat Pelaksana Teknis Kegiatan BLUD,<br />{$surattelaahan.nama_unit}<br />RSUD H. Damanhuri Barabai</div>
+          <div id="qr-code-container" style=" display: flex; justify-content: center; align-items: center; min-height: 50px; margin: 0; padding: 0;">
+            <span id="qr-placeholder"></span>
+          </div>
+          <p style="font-weight: bold; text-decoration: underline; margin: 0; font-size: 14px;">
+            {$surattelaahan.nama_pegawai}
+          </p>
+          <p style="margin-top: 0; font-size: 14px;">NIP. {$surattelaahan.nip}</p>
+        </div>
+      </div>
+
+      <!-- DISPOSISI -->
+      <div style="margin-top: 5px">
+        <div style="font-weight: bold; font-size: 11pt">Disposisi:</div>
+        <table class="disposisi-table">
+          <tr>
+            <th width="35%" style="font-size: 11pt;">Pejabat Keuangan</th>
+            <td class="disposisi-box"></td>
+          </tr>
+          <tr>
+            <th width="35%" style="font-size: 11pt;">Direktur/Pemimpin BLUD/ Kuasa Pengguna Anggaran</th>
+            <td class="disposisi-box"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- Modal Structure -->
+    <div id="ttdModal" class="custom-modal no-print">
+      <div class="custom-modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Pilih Tanda Tangan</h3>
+        <div class="ttd-grid">
+          {loop: $ttd_files}
+          <div
+            class="ttd-item"
+            data-src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}"
+          >
+            <img
+              src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}"
+              alt="{$value}"
+            />
+            <p style="margin-top: 5px; font-size: 12px">{$value}</p>
+          </div>
+          {/loop}
+        </div>
+      </div>
+    </div>
+
+    <script src="{?= url('assets/jscripts/jquery.min.js') ?}"></script>
+    <script>
+      $(document).ready(function () {
+        var modal = $("#ttdModal");
+        var span = $(".close-modal");
+
+        $("#btn-sign").on("click", function () {
+          modal.show();
+        });
+
+        span.on("click", function () {
+          modal.hide();
+        });
+
+        $(window).on("click", function (event) {
+          if ($(event.target).is(modal)) {
+            modal.hide();
+          }
+        });
+
+        $(".ttd-item").on("click", function () {
+          var src = $(this).data("src");
+          if (!confirm("Gunakan tanda tangan ini?")) return;
+
+          $("#qr-placeholder").hide();
+          $("#qr-code-container").html(
+            '<img src="' + src + '" style="height: 70px; width: auto;">',
+          );
+
+          modal.hide();
+          $("#btn-sign").hide();
+        });
+      });
+    </script>
+  </body>
+</html>

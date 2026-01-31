@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  /* Style dasar area cetak */
+  .print-area {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+    font-size: 12pt;
+    color: #111827;
+  }
+  .print-container { max-width: 1800px; margin: 0 auto; padding: 8px 16px; }
+  .page-title { text-align: center; font-size: 24px; font-weight: 700; margin: 40px 0 24px; color: #0f172a; }
+  .subtitle { font-size: 14px; margin-bottom: 14px; font-weight: 600; color: #374151; }
+  .btn-tombol { justify-content: center; border: 0; border-radius: 8px; padding: 10px 14px; font-size: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .btn-tombol:hover { background: #1f2937; }
+  /* Penyesuaian ukuran tombol-tombol agar seragam dengan tombol kecil */
+  .card.card-default .card-footer .btn-tombol { padding: 8px 12px; }
+  .print-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06); padding: 16px; }
+  /* Modernisasi kartu form dan kontrol */
+  .card.card-default.no-print { border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+  .card.card-default .card-header { background: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 12px 16px; }
+  .card.card-default .card-title { font-weight: 600; color: #0f172a; margin: 0; }
+  .card.card-default .card-body { padding: 16px; }
+  .card.card-default .card-footer { background: transparent; border-top: 0; padding: 12px 16px; display: flex; justify-content: center; gap: 8px; }
+  .card.card-default .form-group label { font-weight: 600; color: #374151; margin-bottom: 6px; }
+  .card.card-default .form-control { border-radius: 10px; border: 1px solid #d1d5db; padding: 8px 12px; transition: border-color .15s ease, box-shadow .15s ease; }
+  .card.card-default .form-control:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); outline: none; }
+  .callout.callout-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #0f172a; border-radius: 10px; padding: 12px 14px; }
+  .btn-primary.btn-sm { border-radius: 8px; }
+  .rka-table { width: 100%; border-collapse: separate; border-spacing: 1; }
+  .rka-table thead th { background: #f3f4f6; color: #111827; font-weight: 600; border-bottom: 0px solid #e5e7eb; padding: 10px; text-align: center; }
+  .rka-table tbody td { border-top: 0px solid #e5e7eb; padding: 1px; vertical-align: top; }
+  .rka-table th, .rka-table td { padding: 8px 12px !important; }
+
+  .rka-table tbody tr:nth-child(odd) { background: #fafafa; }
+  .text-right { text-align: right; }
+  .text-center { text-align: center; }
+  @media print {
+    /* Kertas A4 portrait: top lebih kecil agar kop naik */
+    @page { size: A4; margin: 0mm 12mm; }
+
+    /* Hilangkan margin/padding default di html & body agar kop naik */
+    html, body { margin: 0 !important; padding: 0 !important; }
+
+    /* Sembunyikan elemen non-print (navbar, footer, dll) */
+    .no-print,
+    .sidebar,
+    .navbar,
+    #navbar-wrapper,
+    nav.navbar,
+    .footer,
+    .main-header,
+    .main-sidebar,
+    .control-sidebar,
+    .brand-link,
+    .content-header,
+    .content-title,
+    .icon-bar,
+    #notify,
+    .dropdown-menu,
+    .main-footer,
+    footer { display: none !important; }
+
+    /* Biarkan area surat tampil normal dan gunakan font serif untuk cetak */
+    .print-area { position: static; width: 100%; font-family: 'Times New Roman', Times, serif; color: #000; }
+    .print-container { max-width: none !important; padding: 0 !important; }
+    .print-card { box-shadow: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; }
+
+    /* Tabel cetak klasik: garis tebal hitam, tanpa zebra */
+    .text-kode { font-size: 14px; color: #000; }
+    .text-uraian { font-size: 14px; color: #000; }
+    .text-pergeseran { font-size: 14px; color: #000; }
+    .permintaan { font-size: 14px; color: #000; }
+    .text-total { font-size: 14px; color: #000; }
+    table.rka-table { width: 900px !important; border-collapse: collapse !important; border: 1px solid #000 !important; margin-top: 20px; }
+    .rka-table thead th { background: #fff !important; color: #000 !important; text-align: center !important; border: 1px solid #000 !important; }
+    .rka-table tbody td { background: #fff !important; color: #000 !important; border: 1px solid #000 !important; }
+    .rka-table tbody tr:nth-child(odd) { background: #fff !important; }
+    /* Beri jarak antara isi dan garis saat cetak */
+    .rka-table th, .rka-table td { padding: 8px 12px !important; }
+
+    /* Judul lebih besar saat cetak */
+    .page-title { font-size: 28px !important; color: #000 !important; margin: 0 0 12mm !important; }
+
+    /* Sembunyikan tombol aksi saat cetak */
+    .btn-print { display: none !important; }
+    .subtitle { color: #000 !important; }
+
+    /* Matikan penambahan URL otomatis di belakang tautan saat print */
+    a[href]:after, abbr[title]:after { content: '' !important; }
+  }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
+<div class="wrapper">
+  <div class="content-wrapper">
+    <section class="content" >
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 print-container">
+            <div class="callout callout-info no-print" style="margin-bottom: 20px;">
+              <h5><i class="fa fa-info"></i> &nbsp; Catatan :</h5>
+               Pastikan anda telah menginput semua inputan Surat Usulan RBA terlebih dulu sebelum menekan tombol 🖨️ Print/Simpan pdf.
+            </div>
+            <div class="card card-default no-print" style="margin-bottom: 20px;">
+              <div class="card-header">
+                <h3 class="card-title">Input Surat Usulan RBA</h3>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label for="tanggal_cetak" style="font-weight: 400;">Tanggal :</label>
+                      <input type="date" id="tanggal_cetak" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="nomor_surat">Nomor :</label>
+                      <input type="text" id="nomor_surat" class="form-control" placeholder="Contoh : 001/UNIT/RSUD/2025" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="lampiran_surat">Lampiran :</label>
+                      <input type="text" id="lampiran_surat" class="form-control" placeholder="Masukkan Lampiran surat..." required>
+                    </div> 
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="perihal_surat">Perihal :</label>
+                      <input type="text" id="perihal_surat" class="form-control" placeholder="Masukkan Perihal surat..." required>
+                    </div>
+                    <div class="form-group">
+                      <label for="permasalahan_surat">Permasalahan :</label>
+                      <input type="text" id="permasalahan_surat" class="form-control" placeholder="Masukkan Permasalahan surat...." required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="dasar_surat">Dasar :</label>
+                      <input type="text" id="dasar_surat" class="form-control" placeholder="Masukkan Dasar surat..." required>
+                    </div>
+                    <div class="form-group">
+                      <label for="analisis_surat">Analisis :</label>
+                      <input type="text" id="analisis_surat" class="form-control" placeholder="Masukkan Analisis surat...." required>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="pptk_cetak">Dari PPTK :</label>
+                      <select id="pptk_cetak" value="" class="form-control select2">
+                        <option value="">Pilih PPTK</option>
+                        {loop: $pptk}
+                          <option value="{$value.id_pptk}" 
+                                  data-nama="{$value.nama_pptk}"
+                                  data-nip="{$value.nip}"
+                                  >{$value.nama_pptk}
+                          </option>
+                        {/loop}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-12" hidden>
+                    <div class="form-group">
+                      <label for="nip_pegawai">NIP :</label>
+                      <input type="text" id="nip_pegawai" class="form-control" readonly>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button id="btnTerapkanCetak" class="btn-tombol btn-info btn-sm" style="background: #0743c5; color: #fff;">Terapkan</button>
+                <button class="btn-tombol no-print" onclick="window.print()" style="background: #111827; color: #fff;">🖨️ Print / Simpan PDF</button>
+                <a href="{?=url([ADMIN, 'hosplan', 'usulanrba'])?}" class="btn-tombol btn-secondary no-print" style="background: #dc0404; color: #fff;">Kembali</a>
+              </div>
+            </div>
+            <!-- Main content -->
+            <div class="print-area">
+              <!-- title row -->
+               <div class="row">
+                <div class="col-12">
+                  <div class="kop" style="font-family: 'Times New Roman', Times, serif; text-align: center; border-bottom: 2px solid #000; padding-bottom: 4px; margin-top: 0; margin-bottom: 12px;">
+                    <img src="{?= url('/plugins/hosplan/img/hst.png') ?}" alt="Logo" style="float: left; width: 70px; height: 100px; margin-left: 1px; margin-right: 1px;">
+                        <h4 style="font-size: 22px; margin-top: 1px; margin-bottom: 1px; margin-left: 1px;"><b>PEMERINTAH KABUPATEN HULU SUNGAI TENGAH</b></h4>
+                        <h4 style="font-size: 22px; margin-top: 1px; margin-bottom: 1px;"><b>DINAS KESEHATAN</b></h4>
+                        <h3 style="font-size: 19px; margin-top: 1px; margin-bottom: 1px;"><b>UPT RSUD H. DAMANHURI BARABAI</b></h3>
+                        <p style="font-size: 14px; margin-top: 1px; margin-bottom: 1px;">Jalan Murakata Nomor 4 Barabai Barat Hulu Sungai Tengah Kalimantan Selatan 71314</p>
+                        <p style="font-size: 14px; margin-top: 1px; margin-bottom: 1px;">Telp : 0811 5008080 Laman : www.rshdbarabai.com, Pos-el : rshd@hstkab.go.id</p>
+                  </div>    
+                </div>
+              </div>
+              <div class="row">
+                <div class="col 12">
+                 <div class="judul" style="font-family: 'Times New Roman', Times, serif; text-align: center; font-weight: bold; text-decoration: underline; font-size: 20px; margin-bottom: 20px;">TELAAHAN STAF</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <style>
+                    .meta-grid { display: grid; grid-template-columns: 160px 12px 1fr; column-gap: 6px; row-gap: 8px; margin-bottom: 10px; align-items: start; }
+                    .meta-label { color: #000; }
+                    .meta-sep { color: #000; text-align: center; }
+                    .meta-value { color: #000; font-weight: 400; }
+                    .meta-grid div { line-height: 1.25; }
+                    .meta-divider { grid-column: 1 / -1; height: 2px; background: #000; margin: 6px 0; }
+                    .print-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; background: #fff; }
+                    .rka-table { width: 100%; border-collapse: collapse; }
+                    .rka-table thead th { background: #f5f7fa !important; color: #000 !important; }
+                    .rka-table tbody tr:nth-child(odd) { background: #fff !important; }
+                    .rka-table td.text-pergeseran, .rka-table td.permintaan, .rka-table td.text-total { text-align: right !important; }
+                    .rka-table tbody tr.total-row td { font-weight: 700; background: #f9fafb; }
+                  </style>
+                  <div class="meta-grid subtitle">
+                    <div class="meta-label">Kepada</div><div class="meta-sep">:</div><div class="meta-value">Pemimpin BLUD RSUD H. Damanhuri Barabai</div>
+                    <div class="meta-label">Dari</div><div class="meta-sep">:</div><div class="meta-value">Pejabat Pelaksana Teknis Kegiatan</div>
+                    <div class="meta-label">Tanggal</div><div class="meta-sep">:</div><div class="meta-value"><span id="tanggal_area">-</span></div>
+                    <div class="meta-label">Lampiran</div><div class="meta-sep">:</div><div class="meta-value"><span id="lampiran_area">-</span></div>
+                    <div class="meta-label">Nomor</div><div class="meta-sep">:</div><div class="meta-value"><span id="nomor_area">-</span></div>
+                    <div class="meta-label">Sifat</div><div class="meta-sep">:</div><div class="meta-value">Biasa</div>
+                    <div class="meta-label">Perihal</div><div class="meta-sep">:</div><div class="meta-value"><span id="perihal_area">-</span></div>
+                    <div class="meta-divider"></div>
+                    <div class="meta-label">Dasar</div><div class="meta-sep">:</div><div class="meta-value"><span id="dasar_area">-</span></div>
+                    <div class="meta-label">Permasalahan</div><div class="meta-sep">:</div><div class="meta-value"><span id="permasalahan_area">-</span></div>
+                    <div class="meta-label">Analisis</div><div class="meta-sep">:</div><div class="meta-value"><span id="analisis_area">-</span></div>
+                  </div>
+                  <div class="print-card">
+                    <table class="rka-table">
+                      <thead>
+                        <tr>
+                          <th class="text-kode" style="text-align: center;">Kode Akun</th>
+                          <th class="text-uraian" style="text-align: center;">Uraian</th>
+                          <th class="text-pergeseran" style="text-align: center;">Anggaran Pergeseran</th>
+                          <th class="permintaan" style="text-align: center;">Permintaan Anggaran</th>
+                          <th class="text-total" style="text-align: center;">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {loop: $usulanrba}
+                        <tr>
+                          <td class="text-kode" style="text-align: left;">{$value.kode_akun}</td>
+                          <td class="text-uraian" style="text-align: left;">{$value.uraian_kegiatan}</td>
+                          <td class="text-pergeseran" style="text-align: center;">Rp. {?=number_format($value['pergeseran'], 0, ',', '.')?}</td>
+                          <td class="permintaan" style="text-align: center;">Rp. {?=number_format($value['permintaan_anggaran'], 0, ',', '.')?}</td>
+                          <td class="text-total" style="text-align: center;">Rp. {?=number_format($value['total'], 0, ',', '.')?}</td>
+                        </tr>
+                        {/loop}
+                        <tr class="total-row">
+                          <td colspan="2" style="text-align: center;">Total</td>
+                          <td id="sum-pergeseran" style="text-align: right;">Rp. -</td>
+                          <td id="sum-permintaan" style="text-align: right;">Rp. -</td>
+                          <td id="sum-total" style="text-align: right;">Rp. -</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                    <div class="signature" style="width: 320px; float: right; margin-top: 50px; text-align: center; font-size: 14px;">
+                      <div>Pejabat Pelaksana Teknis Kegiatan</div>
+
+                      
+
+                      <!-- Ruang tanda tangan -->
+                      <div style="height: 40px"></div>
+
+                      <div class="name" style="margin-top: 30px; font-weight: 700;"><span id="pegawai_area" style="text-decoration: underline;">-</span></div>
+                      <div style="font-size: 14px"><span id="nip_area">-</span></div>
+                    </div>
+                    <div class="disposisi" style="margin-top: 200px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 12px;"><b>Disposisi</b></div>
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+                            <tr>
+                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 100px; width: 350px;"><b>Kasubag Perencanaan dan Keuangan BLUD</b></td>
+                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 120px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 100px; width: 350px;"><b>Pemimpin BLUD</b></td>
+                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 120px;"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+                <!-- /.col -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+<script>
+  if (window.jQuery && typeof $.fn.select2 === 'function') {
+    $('.select2').select2({
+      placeholder: "Ketik minimal 3 huruf untuk mencari...",
+      width: '100%',
+      language: {
+        inputTooShort: function() {
+          return "Ketik minimal 3 huruf untuk mencari";
+        },
+        noResults: function() {
+          return "Tidak ada hasil ditemukan";
+        }
+      }
+    });
+  }
+  const checkAllEl = document.getElementById('checkAll');
+  if (checkAllEl) {
+    checkAllEl.addEventListener('change', function() {
+      document.querySelectorAll('input[name="id_usulan[]"]').forEach(cb => cb.checked = this.checked);
+    });
+  }
+  // Hitung total kolom tabel berdasarkan baris yang tampil
+  function updateTableTotals() {
+    const rows = document.querySelectorAll('.rka-table tbody tr');
+    let sumPergeseran = 0;
+    let sumPermintaan = 0;
+    let sumTotal = 0;
+
+    const toNumber = (txt) => {
+      if (!txt) return 0;
+      const clean = String(txt).replace(/[^0-9]/g, '');
+      const n = parseInt(clean, 10);
+      return isNaN(n) ? 0 : n;
+    };
+
+    rows.forEach((row) => {
+      const pergeseranCell = row.querySelector('td.text-pergeseran');
+      const permintaanCell = row.querySelector('td.permintaan');
+      const totalCell = row.querySelector('td.text-total');
+      // Abaikan baris total karena tidak memiliki class di atas
+      if (pergeseranCell && permintaanCell && totalCell) {
+        sumPergeseran += toNumber(pergeseranCell.textContent);
+        sumPermintaan += toNumber(permintaanCell.textContent);
+        sumTotal += toNumber(totalCell.textContent);
+      }
+    });
+
+    const formatIdr = (n) => 'Rp. ' + n.toLocaleString('id-ID');
+    const pergeseranSumEl = document.getElementById('sum-pergeseran');
+    const permintaanSumEl = document.getElementById('sum-permintaan');
+    const totalSumEl = document.getElementById('sum-total');
+    if (pergeseranSumEl) pergeseranSumEl.textContent = formatIdr(sumPergeseran);
+    if (permintaanSumEl) permintaanSumEl.textContent = formatIdr(sumPermintaan);
+    if (totalSumEl) totalSumEl.textContent = formatIdr(sumTotal);
+  }
+
+  document.addEventListener('DOMContentLoaded', updateTableTotals);
+  document.getElementById('btnTerapkanCetak').addEventListener('click', function() {
+    const tanggalInput = document.getElementById('tanggal_cetak').value;
+    const pptkSelect = document.getElementById('pptk_cetak');
+    const selectedOption = (pptkSelect && pptkSelect.selectedIndex >= 0)
+      ? pptkSelect.options[pptkSelect.selectedIndex]
+      : null;
+    const namaPptk = selectedOption ? (selectedOption.getAttribute('data-nama') || selectedOption.textContent || '') : '';
+    const nipPptk = selectedOption ? (selectedOption.getAttribute('data-nip') || '') : '';
+    const lampiran = (document.getElementById('lampiran_surat').value || '').trim();
+    const perihal = (document.getElementById('perihal_surat').value || '').trim();
+    const nomor = (document.getElementById('nomor_surat').value || '').trim();
+    const dasar = (document.getElementById('dasar_surat').value || '').trim();
+    const permasalahan = (document.getElementById('permasalahan_surat').value || '').trim();
+    const analisis = (document.getElementById('analisis_surat').value || '').trim();
+
+    if (tanggalInput) {
+      const tanggalBaru = new Date(tanggalInput);
+      const options = { day: 'numeric', month: 'long', year: 'numeric' };
+      let formatTanggal = tanggalBaru.toLocaleDateString('id-ID', options);
+      formatTanggal = formatTanggal.replace(/(\s[a-z])/, function(m) { return m.toUpperCase(); });
+
+      // Tampilkan tanggal saja pada span; teks "Barabai," sudah ada di markup
+      const tanggalAreaEl = document.getElementById('tanggal_area');
+      if (tanggalAreaEl) tanggalAreaEl.innerText = formatTanggal;
+    }
+    // Update teks dari inputan
+    const lampiranAreaEl = document.getElementById('lampiran_area');
+    if (lampiranAreaEl) lampiranAreaEl.innerText = lampiran || '-';
+    const perihalAreaEl = document.getElementById('perihal_area');
+    if (perihalAreaEl) perihalAreaEl.innerText = perihal || '-';
+    const nomorAreaEl = document.getElementById('nomor_area');
+    if (nomorAreaEl) nomorAreaEl.innerText = nomor || '-';
+    const dasarAreaEl = document.getElementById('dasar_area');
+    if (dasarAreaEl) dasarAreaEl.innerText = dasar || '-';
+    const permasalahanAreaEl = document.getElementById('permasalahan_area');
+    if (permasalahanAreaEl) permasalahanAreaEl.innerText = permasalahan || '-';
+    const analisisAreaEl = document.getElementById('analisis_area');
+    if (analisisAreaEl) analisisAreaEl.innerText = analisis || '-';
+
+    // Update identitas PPTK pada area tanda tangan
+    const pegawaiAreaEl = document.getElementById('pegawai_area');
+    if (pegawaiAreaEl) pegawaiAreaEl.innerText = namaPptk || '-';
+    const nipAreaEl = document.getElementById('nip_area');
+    if (nipAreaEl) nipAreaEl.innerText = nipPptk ? `NIP. ${nipPptk}` : '-';
+  });
+
+  // Autofill nama dan NIP saat unit dipilih
+  const pptkCetakEl = document.getElementById('pptk_cetak');
+  if (pptkCetakEl) {
+    function fillFromSelectedOption(sel) {
+      if (!sel) return;
+      const nama = sel.getAttribute('data-nama') || sel.textContent || '';
+      const nip = sel.getAttribute('data-nip') || '';
+      // Simpan ke input tersembunyi bila diperlukan
+      const nipInputEl = document.getElementById('nip_pegawai');
+      if (nipInputEl) nipInputEl.value = nip;
+      // Perbarui area tanda tangan
+      const pegawaiEl = document.getElementById('pegawai_area');
+      if (pegawaiEl) pegawaiEl.innerText = nama || '-';
+      const nipEl = document.getElementById('nip_area');
+      if (nipEl) nipEl.innerText = nip ? `NIP. ${nip}` : '-';
+    }
+
+    pptkCetakEl.addEventListener('change', function() {
+      const selected = this.options[this.selectedIndex];
+      fillFromSelectedOption(selected);
+    });
+
+    // Jika Select2 aktif, pastikan event spesifiknya juga memicu autofill
+    if (window.jQuery && typeof $.fn.select2 === 'function') {
+      $('#pptk_cetak').on('select2:select', function(e) {
+        const idx = pptkCetakEl.selectedIndex;
+        const selected = pptkCetakEl.options[idx];
+        fillFromSelectedOption(selected);
+      });
+      $('#pptk_cetak').on('select2:clear', function() {
+        document.getElementById('nip_pegawai').value = '';
+        document.getElementById('pegawai_area').innerText = '-';
+        document.getElementById('nip_area').innerText = '-';
+        document.getElementById('unit_area2').innerText = '-';
+      });
+    }
+  }
+</script>
+</body>
+</html>

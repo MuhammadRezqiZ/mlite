@@ -1,0 +1,170 @@
+<style media="screen">
+  .modern-stat-card {
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .modern-stat-card.alkes {
+    background: linear-gradient(135deg, #4CAF50 0%, #338937 100%);
+  }
+  
+  .modern-stat-card.kantor {
+    background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%);
+  }
+  
+  .modern-stat-card.rumah-tangga {
+    background: linear-gradient(135deg, #FFC107 0%, #F57C00 100%);
+  }
+  
+  .modern-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+  }
+  
+  .modern-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  
+  .stat-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 4em;
+    opacity: 0.3;
+  }
+  
+  .stat-category {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .stat-numbers {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .stat-item {
+    text-align: center;
+    flex: 1;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: block;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .stat-label {
+    font-size: 1em;
+    opacity: 0.9;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .stats-container {
+    margin-bottom: 30px;
+  }
+  .notif-badge{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    background:#ff3b30;
+    color:#fff;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    min-width:22px;
+    height:22px;
+    line-height:22px;
+    padding:0 6px;
+    border:2px solid #fff;
+    box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    z-index:10;
+  }
+</style>
+
+<!-- Modern Statistics Widget -->
+<div class="stats-container">
+        <div class="stats-body">
+            <div class="row">
+                {if: $stats}
+                {loop: $stats}
+                <div class="col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 10px;">
+                    {if: $key == 'Alkes'}
+                    <div class="modern-stat-card alkes">
+                        <i class="fa fa-medkit stat-icon"></i>
+                    {/if}
+                    {if: $key == 'Kantor'}
+                    <div class="modern-stat-card kantor">
+                        <i class="fa fa-building stat-icon"></i>
+                    {/if}
+                    {if: $key == 'Rumah Tangga'}
+                    <div class="modern-stat-card rumah-tangga">
+                        <i class="fa fa-home stat-icon"></i>
+                    {/if}
+                        <div class="text-center">
+                            <div class="stat-category">
+                                {$key} {$value.total}
+                            </div>
+                            <div class="stat-numbers">
+                                <div class="stat-item">
+                                    <span class="stat-value">{$value.gudang}</span>
+                                    <div class="stat-label">Gudang</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">{$value.terdistribusi}</span>
+                                    <div class="stat-label">Terdistribusi</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/loop}
+                {/if}
+            </div>
+        </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <ul class="modules" style="padding:0;margin:0;">
+            {loop: $sub_modules}
+            <li class="module">
+                <div class="panel panel-default" style="position:relative;">
+                    <a href="{$value.url}" class="panel-body text-center" style="position:relative;">
+                      {if: $value.name == 'Verifikasi Barang' && isset($pendingBarangCount) && $pendingBarangCount > 0}
+                      <span class="notif-badge">{$pendingBarangCount}</span>
+                      {/if}
+                        <div class="panel-thumb">
+                            <i class="fa fa-{$value.icon}"></i>
+                            <div class="desc">
+                                {$value.desc}
+                            </div>
+                        </div>
+                        <h4><b>{$value.name}</b></h4>
+                    </a>
+                </div>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>

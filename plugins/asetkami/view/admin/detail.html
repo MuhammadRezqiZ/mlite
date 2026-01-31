@@ -1,0 +1,806 @@
+<style>
+    /* Badge untuk kolom Status */
+    .status-badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:9999px;
+      font-size:12px;
+      font-weight:600;
+      color:#fff;
+      background:#6b7280; /* default grey */
+    }
+    .status-badge[data-status="kirim"]{background:#22c55e} /* sky-500 */
+    .status-badge[data-status="verifikasi"]{background:#0ea5e9} /* green-500 */
+    .status-badge[data-status="ditolak"]{background:#ef4444} /* red-500 */
+
+    :root{
+    --bg-soft:#f8fafc;
+    --border-soft:#e5e7eb;
+    --text-muted:#64748b;
+    --primary:#0ea5e9;
+    --success:#10b981;
+    --warning:#f59e0b;
+    --danger:#ef4444;
+    --secondary:#6b7280;
+    }
+
+    .btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#ff4d4f 0%,#d9363e 100%);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-back:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+    filter:brightness(1.05);
+    color:#fff;
+  }
+</style>
+<div class="back" style="margin-bottom: 20px; text-align: right;">
+  <a href="{?=url([ADMIN, 'asetkami', 'gudang'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{$data.title} - {$data.jenis.nm_jns_barang}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="detailTable">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Merk</th>
+                                <th>Model/Seri</th>
+                                <th>SN</th>
+                                <th>Kelengkapan</th>
+                                <th>Sumber Dana</th>
+                                <th>Asal Barang</th>
+                                <th>Status Barang</th>
+                                <th>Foto</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {if: $data.barang}
+                            {loop: $data.barang}
+                            {if: $value.stok > 0}
+                            <tr>
+                                <td>{$value.tanggal_barang}</td>
+                                <td>{$value.merk}</td>
+                                <td>{$value.model_seri}</td>
+                                <td>{$value.sn}</td>
+                                <td>{$value.kelengkapan}</td>
+                                <td>{$value.sumber_dana}</td>
+                                <td>{$value.asal_barang}</td>
+                                <td class="text-center">
+                                  <span class="status-badge" data-status="{$value.status_verifikasi}">{$value.status_verifikasi}</span>
+                                </td>
+                               
+                                <td>
+                                    {if: $value.foto}
+                                    <img src="{?=url()?}/uploads/aset/{$value.foto}" alt="Foto" style="width: 50px; height: 50px; object-fit: cover;" class="img-thumbnail" onclick="showImage('{?=url()?}/uploads/aset/{$value.foto}')">
+                                    {else}
+                                    <span class="text-muted">Tidak ada foto</span>
+                                    {/if}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal{$value.id}">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                    <a href="{?=url([ADMIN, 'asetkami', 'hapus', $value.id])?}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <i class="fa fa-trash"></i> Hapus
+                                    </a>
+                                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#distribusiModal{$value.id}">
+                                        <i class="fa fa-share"></i> Distribusi
+                                    </button>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <!-- Modal Distribusi -->
+                            <div class="modal fade" id="distribusiModal{$value.id}" tabindex="-1" role="dialog">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Distribusi Barang</h4>
+                                        </div>
+                                        <form method="post" action="{?=url([ADMIN, 'asetkami', 'distribusi'])?}" id="distribusiForm{$value.id}">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="barang_id" value="{$value.id}">
+                                                <input type="hidden" name="redirect_url" value="{?=url([ADMIN, 'asetkami', 'detail', $data.jenis.kd_jns_barang])?}">
+
+                                                <div class="form-group">
+                                                    <label>Barang:</label>
+                                                    <p><strong>{$value.merk} {$value.model_seri} (SN: {$value.sn})</strong></p>
+                                                </div>
+                                                <!-- Form Generator -->
+                                                <div class="panel panel-info">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">Auto Generate Kode Distribusi</h4>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <!-- Kode Distribusi Generator -->
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label>Kode Distribusi :</label>
+                                                                    <input type="text" name="kd_distribusi" id="kd_distribusi{$value.id}" class="form-control" readonly style="background-color: #f5f5f5;">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Alert untuk distribusi ulang -->
+                                                        <div class="alert alert-info" id="returnAlert{$value.id}" style="display: none;">
+                                                            <i class="fa fa-info-circle"></i> <strong>Distribusi Ulang:</strong> Barang ini pernah didistribusi sebelumnya. Kode distribusi akan menggunakan kode yang sama.
+                                                        </div>
+                                                    
+                                                        <div class="row" id="intraEktraRow{$value.id}">
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label>Intra/Ektra:</label>
+                                                                    <select name="intra_ektra" id="intra_ektra{$value.id}" class="form-control" required>
+                                                                        <option value="">Pilih Intra/Ektra</option>
+                                                                        <option value="01">Intra (01)</option>
+                                                                        <option value="02">Ektra (02)</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label>Sumber:</label>
+                                                                    <select name="sumber" id="sumber{$value.id}" class="form-control" required>
+                                                                        <option value="">Pilih Sumber</option>
+                                                                        <option value="01">BLUD (01)</option>
+                                                                        <option value="02">APBD (02)</option>
+                                                                        <option value="03">Lainnya (03)</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label for="">Tanggal Pengadaan:</label>
+                                                                    <input type="date" id="tanggal_barang" name="tanggal_barang" class="form-control" required>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Bidang:</label>
+                                                                    <select name="bidang" id="bidang{$value.id}" class="form-control" required>
+                                                                        <option value="">Pilih Bidang</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label>Unit/Ruangan:</label>
+                                                                    <select name="unit_ruangan" id="unit_ruangan{$value.id}" class="form-control" required>
+                                                                        <option value="">Pilih Unit/Ruangan</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Ruangan:</label>
+                                                    <input type="text" name="kd_bangsal" id="kd_bangsal{$value.id}" class="form-control" readonly style="background-color: #f5f5f5;">
+                                                    <small class="text-muted">Ruangan otomatis terisi dari Unit/Ruangan yang dipilih</small>
+                                                </div>
+                                                <div class="form-group hidden">
+                                                    <label>Petugas:</label>
+                                                    <input type="text" name="petugas" id="petugas{$value.id}" class="form-control" readonly style="background-color: #f5f5f5;">
+                                                    <small class="text-muted">Petugas otomatis terisi dengan user yang login</small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Keterangan:</label>
+                                                    <textarea name="keterangan" class="form-control" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-warning">Distribusikan</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Modal Edit -->
+                            <div class="modal fade" id="editModal{$value.id}" tabindex="-1" role="dialog">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">Edit Barang</h4>
+                                        </div>
+                                        <form method="post" action="{?=url([ADMIN, 'asetkami', 'edit'])?}" enctype="multipart/form-data">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="id" value="{$value.id}">
+                                                <div class="row">
+                                                    <!-- <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label for="tanggal_input">Tanggal:</label>
+                                                            <input id="tanggal_input{$value.id}" type="date" name="tanggal_input" class="form-control" value="{$value.tanggal_input}" required>
+                                                        </div>
+                                                    </div> -->
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Merk:</label>
+                                                            <input type="text" name="merk" class="form-control" value="{$value.merk}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Model/Seri:</label>
+                                                            <input type="text" name="model_seri" class="form-control" value="{$value.model_seri}" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Serial Number:</label>
+                                                            <input type="text" name="sn" class="form-control" value="{$value.sn}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Stok:</label>
+                                                            <input type="number" name="stok" class="form-control" value="{$value.stok}" min="1" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Tanggal:</label>
+                                                            <input type="text" name="tanggal_barang" class="form-control" value="{$value.tanggal_barang_raw}" required onfocus="(this.type='date')" onblur="(this.type='text')" placeholder="DD-MM-YYYY">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Kelengkapan:</label>
+                                                    <textarea name="kelengkapan" class="form-control" rows="3">{$value.kelengkapan}</textarea>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Sumber Dana:</label>
+                                                            <select name="sumber_dana" class="form-control" required>
+                                                                <option value="">Pilih Sumber Dana</option>
+                                                                <option value="BLUD" {if: $value.sumber_dana == 'BLUD'}selected{/if}>BLUD</option>
+                                                                <option value="APBD" {if: $value.sumber_dana == 'APBD'}selected{/if}>APBD</option>
+                                                                <option value="Lainnya" {if: $value.sumber_dana == 'Lainnya'}selected{/if}>Lainnya</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Asal Barang:</label>
+                                                            <select name="asal_barang" class="form-control" required>
+                                                                <option value="">Pilih Asal Barang</option>
+                                                                <option value="Pengadaan" {if: $value.asal_barang == 'Pengadaan'}selected{/if}>Pengadaan</option>
+                                                                <option value="Hibah" {if: $value.asal_barang == 'Hibah'}selected{/if}>Hibah</option>
+                                                                <option value="Bantuan" {if: $value.asal_barang == 'Bantuan'}selected{/if}>Bantuan</option>
+                                                                <option value="Sumbangan" {if: $value.asal_barang == 'Sumbangan'}selected{/if}>Sumbangan</option>
+                                                                <option value="dll" {if: $value.asal_barang == 'dll'}selected{/if}>Lainnya</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Foto:</label>
+                                                            <input type="file" name="foto" class="form-control" accept="image/*">
+                                                            {if: $value.foto}
+                                                            <small class="text-muted">Foto saat ini: {$value.foto}</small>
+                                                            {/if}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Verifikasi Barang :</label>
+                                                            <select name="status_verifikasi" id="status_verifikasi" class="form-control" required>
+                                                              <option value="">Pilih Status</option>
+                                                              <option value="kirim" {if: $value.status_verifikasi == 'kirim'}selected{/if}>Kirim</option>
+                                                              <option value="verifikasi" {if: $value.status_verifikasi == 'verifikasi'}selected{/if}>Verifikasi</option>
+                                                              <option value="ditolak" {if: $value.status_verifikasi == 'ditolak'}selected{/if}>Ditolak</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {/if}
+                            {/loop}
+                            {else}
+                            <tr>
+                                <td colspan="10" class="text-center">Tidak ada data barang</td>
+                            </tr>
+                            {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal untuk menampilkan gambar -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Foto Barang</h4>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Foto Barang" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var table = $('#detailTable').DataTable({
+        "language": {
+            "url": "{?=url('assets/jscripts/dataTables-id.json')?}"
+        }
+    });
+    
+
+    
+    // Initialize Selectator for all select elements
+    $('select').selectator();
+    
+    // Global event delegation for all selectator option clicks
+    $(document).on('click', '.selectator_option', function(e) {
+        console.log('Selectator option clicked:', $(this).text(), $(this).data('value'));
+        
+        // Find the parent selectator element and its corresponding select
+        const selectatorElement = $(this).closest('.selectator_element');
+        const originalSelect = selectatorElement.prev('select');
+        
+        if (originalSelect.length > 0) {
+            const selectId = originalSelect.attr('id');
+            const optionValue = $(this).data('value');
+            
+            console.log('Processing click for select:', selectId, 'value:', optionValue);
+            
+            // Update the select value and trigger processing
+            setTimeout(function() {
+                originalSelect.val(optionValue);
+                
+                if (selectId && selectId.startsWith('bidang')) {
+                    const formId = selectId.replace('bidang', '');
+                    console.log('Updating unit ruangan for formId:', formId);
+                    updateUnitRuangan(formId);
+                    generateKodeDistribusi(formId);
+                } else if (selectId && (selectId.startsWith('intra_ektra') || selectId.startsWith('sumber') || selectId.startsWith('unit_ruangan'))) {
+                    const formId = selectId.replace(/^(intra_ektra|sumber|unit_ruangan)/, '');
+                    console.log('Generating kode distribusi for formId:', formId);
+                    generateKodeDistribusi(formId);
+                }
+            }, 50);
+        }
+    });
+    
+    // Setup modal event listeners
+    $(document).on('shown.bs.modal', '[id^="distribusiModal"]', function() {
+        const modalId = this.id;
+        const formId = modalId.replace('distribusiModal', '');
+        console.log('Modal opened for formId:', formId);
+        
+        // Load bidang data when modal opens
+        loadBidangData(formId);
+        
+        // Wait for modal to fully render then setup monitoring
+        setTimeout(function() {
+            setupSelectatorMonitoring(formId);
+        }, 300);
+    });
+    
+    // Debug: Check if modal elements exist on page load
+    console.log('Document ready, checking modal elements...');
+    console.log('Distribusi modals found:', $('[id^="distribusiModal"]').length);
+    console.log('Bidang selects found:', $('[id^="bidang"]').length);
+    console.log('Unit selects found:', $('[id^="unit_ruangan"]').length);
+    
+    // Fallback: Monitor all selectator option clicks globally
+    $(document).on('click', '.selectator_option', function() {
+        console.log('Global selectator option clicked:', $(this).text());
+        
+        const selectatorElement = $(this).closest('.selectator_element');
+        const originalSelect = selectatorElement.prev('select');
+        
+        if (originalSelect.length > 0) {
+            const selectId = originalSelect.attr('id');
+            console.log('Related select ID:', selectId);
+            
+            if (selectId && selectId.startsWith('bidang')) {
+                const formId = selectId.replace('bidang', '');
+                setTimeout(function() {
+                    console.log('Processing bidang change for formId:', formId);
+                    updateUnitRuangan(formId);
+                    generateKodeDistribusi(formId);
+                }, 100);
+            } else if (selectId && (selectId.startsWith('intra_ektra') || selectId.startsWith('sumber') || selectId.startsWith('unit_ruangan'))) {
+                const formId = selectId.replace(/^(intra_ektra|sumber|unit_ruangan)/, '');
+                setTimeout(function() {
+                    generateKodeDistribusi(formId);
+                }, 100);
+            }
+        }
+    });
+});
+
+// Function to setup Selectator monitoring for a specific form
+function setupSelectatorMonitoring(formId) {
+    console.log('Setting up Selectator monitoring for formId:', formId);
+    
+    const modal = $('#distribusiModal' + formId);
+    if (modal.length === 0) {
+        console.log('Modal not found for formId:', formId);
+        return;
+    }
+    
+    // Find all selectator elements in this modal
+    const selectatorElements = modal.find('.selectator_element');
+    console.log('Found selectator elements:', selectatorElements.length);
+    
+    // Setup direct event listeners on selectator elements
+    selectatorElements.each(function() {
+        const selectatorElement = $(this);
+        const originalSelect = selectatorElement.prev('select');
+        
+        if (originalSelect.length > 0) {
+            const selectId = originalSelect.attr('id');
+            console.log('Setting up monitoring for select:', selectId);
+            
+            // Monitor clicks on the selectator element itself
+            selectatorElement.off('click.distribusi').on('click.distribusi', function() {
+                console.log('Selectator element clicked:', selectId);
+                
+                // Wait for the value to be updated
+                setTimeout(function() {
+                    const newValue = originalSelect.val();
+                    console.log('New value for', selectId, ':', newValue);
+                    
+                    if (selectId && selectId.startsWith('barang_id')) {
+                        const formIdFromSelect = selectId.replace('barang_id', '');
+                        const barangValue = newValue;
+                        if (barangValue) {
+                            checkBarangReturn(barangValue, formIdFromSelect);
+                        } else {
+                            resetFormToNormal(formIdFromSelect);
+                        }
+                    } else if (selectId && selectId.startsWith('bidang')) {
+                        const formIdFromSelect = selectId.replace('bidang', '');
+                        updateUnitRuangan(formIdFromSelect);
+                        generateKodeDistribusi(formIdFromSelect);
+                    } else if (selectId && (selectId.startsWith('intra_ektra') || selectId.startsWith('sumber') || selectId.startsWith('unit_ruangan'))) {
+                        const formIdFromSelect = selectId.replace(/^(intra_ektra|sumber|unit_ruangan)/, '');
+                        generateKodeDistribusi(formIdFromSelect);
+                    }
+                }, 50);
+            });
+            
+            // Also monitor the original select element for any direct changes
+            originalSelect.off('change.distribusi').on('change.distribusi', function() {
+                console.log('Original select changed:', selectId, 'value:', $(this).val());
+                
+                if (selectId && selectId.startsWith('barang_id')) {
+                    const formIdFromSelect = selectId.replace('barang_id', '');
+                    const barangValue = $(this).val();
+                    if (barangValue) {
+                        checkBarangReturn(barangValue, formIdFromSelect);
+                    } else {
+                        resetFormToNormal(formIdFromSelect);
+                    }
+                } else if (selectId && selectId.startsWith('bidang')) {
+                    const formIdFromSelect = selectId.replace('bidang', '');
+                    updateUnitRuangan(formIdFromSelect);
+                    generateKodeDistribusi(formIdFromSelect);
+                } else if (selectId && (selectId.startsWith('intra_ektra') || selectId.startsWith('sumber') || selectId.startsWith('unit_ruangan'))) {
+                    const formIdFromSelect = selectId.replace(/^(intra_ektra|sumber|unit_ruangan)/, '');
+                    generateKodeDistribusi(formIdFromSelect);
+                }
+            });
+        }
+    });
+    
+    // Setup MutationObserver to watch for DOM changes in selectator elements
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                const target = $(mutation.target);
+                if (target.hasClass('selectator_element') || target.closest('.selectator_element').length > 0) {
+                    const selectatorElement = target.hasClass('selectator_element') ? target : target.closest('.selectator_element');
+                    const originalSelect = selectatorElement.prev('select');
+                    
+                    if (originalSelect.length > 0) {
+                        const selectId = originalSelect.attr('id');
+                        console.log('DOM mutation detected for:', selectId);
+                        
+                        setTimeout(function() {
+                            if (selectId && selectId.startsWith('barang_id')) {
+                                const formIdFromSelect = selectId.replace('barang_id', '');
+                                const barangValue = originalSelect.val();
+                                if (barangValue) {
+                                    checkBarangReturn(barangValue, formIdFromSelect);
+                                } else {
+                                    resetFormToNormal(formIdFromSelect);
+                                }
+                            } else if (selectId && selectId.startsWith('bidang')) {
+                                const formIdFromSelect = selectId.replace('bidang', '');
+                                updateUnitRuangan(formIdFromSelect);
+                                generateKodeDistribusi(formIdFromSelect);
+                            } else if (selectId && (selectId.startsWith('intra_ektra') || selectId.startsWith('sumber') || selectId.startsWith('unit_ruangan'))) {
+                                const formIdFromSelect = selectId.replace(/^(intra_ektra|sumber|unit_ruangan)/, '');
+                                generateKodeDistribusi(formIdFromSelect);
+                            }
+                        }, 50);
+                    }
+                }
+            }
+        });
+    });
+    
+    // Start observing
+    observer.observe(modal[0], {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'data-value']
+    });
+    
+    // Stop observing when modal is closed
+    modal.off('hidden.bs.modal.distribusi').on('hidden.bs.modal.distribusi', function() {
+        console.log('Modal closed, stopping monitoring for formId:', formId);
+        observer.disconnect();
+        
+        // Remove event listeners
+        selectatorElements.off('.distribusi');
+        modal.find('select').off('.distribusi');
+    });
+}
+
+function showImage(src) {
+    $('#modalImage').attr('src', src);
+    $('#imageModal').modal('show');
+}
+
+// Load bidang data from API
+function loadBidangData(formId) {
+    console.log('loadBidangData called with formId:', formId);
+    const bidangSelect = $('#bidang' + formId);
+    console.log('Bidang select element found:', bidangSelect.length > 0);
+    
+    // Clear existing options first
+    bidangSelect.empty().append('<option value="">Pilih Bidang</option>');
+    
+    $.ajax({
+        url: '{?=url([ADMIN, "asetkami", "apibidang"])?}',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            console.log('Bidang API response:', data);
+            
+            // Clear existing options inside success callback to prevent duplication
+            bidangSelect.empty().append('<option value="">Pilih Bidang</option>');
+            
+            if (data && data.length > 0) {
+                data.forEach(function(bidang) {
+                    bidangSelect.append('<option value="' + bidang.kode_bidang + '">' + bidang.nama_bidang + ' (' + bidang.kode_bidang + ')</option>');
+                });
+                console.log('Added', data.length, 'bidang to dropdown from API');
+            } else {
+                console.log('No bidang data received from API, using fallback');
+                loadFallbackBidang(bidangSelect);
+            }
+            
+            // Reinitialize Selectator for the updated dropdown
+            bidangSelect.selectator('destroy').selectator();
+            console.log('Selectator reinitialized for bidang dropdown');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching bidang:', error, 'Status:', status, 'XHR:', xhr);
+            console.log('Using fallback bidang data');
+            
+            // Clear existing options inside error callback to prevent duplication
+            bidangSelect.empty().append('<option value="">Pilih Bidang</option>');
+            
+            loadFallbackBidang(bidangSelect);
+            
+            // Reinitialize Selectator for the updated dropdown
+            bidangSelect.selectator('destroy').selectator();
+        }
+    });
+}
+
+// Function to load fallback bidang data
+function loadFallbackBidang(bidangSelect) {
+    const fallbackBidang = [
+        {kode_bidang: '01', nama_bidang: 'Direktur'},
+        {kode_bidang: '02', nama_bidang: 'Kabag AUK'},
+        {kode_bidang: '03', nama_bidang: 'Bidang Yanmed'},
+        {kode_bidang: '04', nama_bidang: 'Bidang Keperawatan/Rajal'},
+        {kode_bidang: '05', nama_bidang: 'Bidang Keperawatan/Ranap'},
+        {kode_bidang: '06', nama_bidang: 'Bidang Yannonmed'},
+        {kode_bidang: '07', nama_bidang: 'Subbag Kepegawaian'},
+        {kode_bidang: '08', nama_bidang: 'Subbag Keuangan'},
+        {kode_bidang: '09', nama_bidang: 'Subbag RTHH'}
+    ];
+    
+    fallbackBidang.forEach(function(bidang) {
+        bidangSelect.append('<option value="' + bidang.kode_bidang + '">' + bidang.nama_bidang + ' (' + bidang.kode_bidang + ')</option>');
+    });
+    console.log('Added', fallbackBidang.length, 'fallback bidang to dropdown');
+}
+
+// Update unit/ruangan based on bidang selection
+function updateUnitRuangan(formId) {
+    console.log('updateUnitRuangan called with formId:', formId);
+    const bidangValue = $('#bidang' + formId).val();
+    const unitSelect = $('#unit_ruangan' + formId);
+    
+    console.log('Selected bidang value:', bidangValue);
+    console.log('Unit select element found:', unitSelect.length > 0);
+    
+    // Clear unit options
+    unitSelect.empty().append('<option value="">Pilih Unit/Ruangan</option>');
+    
+    if (bidangValue) {
+        console.log('Fetching units for bidang:', bidangValue);
+        $.ajax({
+            url: '{?=url([ADMIN, "asetkami", "apiunit"])?}',
+            type: 'GET',
+            data: { kode_bidang: bidangValue },
+            dataType: 'json',
+            success: function(data) {
+                console.log('Unit API response:', data);
+                
+                // Clear existing options inside success callback to prevent duplication
+                unitSelect.empty().append('<option value="">Pilih Unit/Ruangan</option>');
+
+                if (data && data.length > 0) {
+                    data.forEach(function(unit) {
+                        unitSelect.append('<option value="' + unit.kode_unit + '">' + unit.nama_unit + '</option>');
+                    });
+                    console.log('Added', data.length, 'units to dropdown');
+                } else {
+                    console.log('No units found for bidang:', bidangValue);
+                }
+                
+                // Reinitialize Selectator for the updated dropdown
+                unitSelect.selectator('destroy').selectator();
+                console.log('Selectator reinitialized for unit dropdown');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching unit:', error, 'Status:', status, 'XHR:', xhr);
+                unitSelect.selectator('destroy').selectator();
+            }
+        });
+    } else {
+        console.log('No bidang selected, clearing unit dropdown');
+        unitSelect.selectator('destroy').selectator();
+    }
+}
+
+// Check if barang is return barang
+function checkBarangReturn(barangId, formId) {
+    if (!barangId) {
+        resetFormToNormal(formId);
+        return;
+    }
+    
+    $.ajax({
+        url: '{?=url([ADMIN, "asetkami", "checkbarangreturn"])?}',
+        type: 'GET',
+        data: { barang_id: barangId },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success' && response.is_return_barang) {
+                showReturnMode(formId, response.kd_distribusi);
+            } else {
+                resetFormToNormal(formId);
+            }
+        },
+        error: function() {
+            resetFormToNormal(formId);
+        }
+    });
+}
+
+// Show return mode - hide intra/ektra and sumber fields
+function showReturnMode(formId, kdDistribusi) {
+    $('#returnAlert' + formId).show();
+    $('#intraEktraRow' + formId).hide();
+    $('#kd_distribusi' + formId).val(kdDistribusi);
+    $('#kd_distribusi' + formId).attr('readonly', true);
+}
+
+// Reset form to normal mode
+function resetFormToNormal(formId) {
+    $('#returnAlert' + formId).hide();
+    $('#intraEktraRow' + formId).show();
+    $('#kd_distribusi' + formId).val('');
+    $('#kd_distribusi' + formId).attr('readonly', false);
+    $('#intra_ektra' + formId).val('');
+    $('#sumber' + formId).val('');
+}
+
+// Generate kode distribusi dan isi bangsal otomatis
+function generateKodeDistribusi(formId) {
+    // Check if this is return mode (kd_distribusi is readonly)
+    if ($('#kd_distribusi' + formId).attr('readonly')) {
+        // For return barang, only update bangsal from unit ruangan
+        const unitRuangan = $('#unit_ruangan' + formId).val();
+        if (unitRuangan) {
+            const unitText = $('#unit_ruangan' + formId + ' option:selected').text();
+            $('#kd_bangsal' + formId).val(unitText);
+        } else {
+            $('#kd_bangsal' + formId).val('');
+        }
+        return;
+    }
+    
+    const intraEktra = $('#intra_ektra' + formId).val();
+    const sumber = $('#sumber' + formId).val();
+    const bidang = $('#bidang' + formId).val();
+    const unitRuangan = $('#unit_ruangan' + formId).val();
+    
+    // Isi bangsal otomatis dari unit ruangan yang dipilih
+    if (unitRuangan) {
+        const unitText = $('#unit_ruangan' + formId + ' option:selected').text();
+        $('#kd_bangsal' + formId).val(unitText);
+    } else {
+        $('#kd_bangsal' + formId).val('');
+    }
+    
+    if (intraEktra && sumber && bidang && unitRuangan) {
+        const tahun = new Date().getFullYear();
+
+        // Padding dua digit untuk setiap segmen (kecuali tahun dan urutan)
+        const segIntra  = String(intraEktra).padStart(2, '0');
+        const segSumber = String(sumber).padStart(2, '0');
+        const segBidang = String(bidang).padStart(2, '0');
+        const segUnit   = String(unitRuangan).padStart(2, '0');
+
+        // Preview kode distribusi (urutan akan di-generate oleh server sebagai 3 digit)
+        const kodePreview = `${segIntra}.${segSumber}.${segBidang}.${segUnit}.${tahun}.XXX`;
+        $('#kd_distribusi' + formId).val(kodePreview);
+        $('#kd_distribusi' + formId).attr('placeholder', 'Kode akan di-generate otomatis saat menyimpan');
+    } else {
+        $('#kd_distribusi' + formId).val('');
+        $('#kd_distribusi' + formId).attr('placeholder', 'Lengkapi form untuk preview kode');
+    }
+}
+
+// Function to show image in modal
+function showImage(imageSrc) {
+    $('#modalImage').attr('src', imageSrc);
+    $('#imageModal').modal('show');
+}
+</script>

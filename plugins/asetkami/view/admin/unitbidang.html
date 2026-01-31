@@ -1,0 +1,221 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{$data.title}</h3>
+                <div class="panel-options">
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUnitBidangModal">
+                        <i class="fa fa-plus"></i> Tambah Unit per Bidang
+                    </button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table id="unitBidangTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <!-- <th>No</th> -->
+                                <th>Kode Bidang</th>
+                                <th>Nama Bidang</th>
+                                <th>Kode Unit</th>
+                                <th>Nama Unit</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {if: $data.unitbidang}
+                            {loop: $data.unitbidang}
+                            <tr>
+                                <!-- <td>{$key+1}</td> -->
+                                <td>{$value.kode_bidang}</td>
+                                <td>{$value.nama_bidang}</td>
+                                <td>{$value.kode_unit}</td>
+                                <td>{$value.nama_unit}</td>
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-xs" onclick="editUnitBidang('{$value.kode_bidang}', '{$value.nama_bidang}', '{$value.kode_unit}', '{$value.nama_unit}')">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                    <a href="{?=url([ADMIN, 'asetkami', 'delete_unitbidang', $value.kode_bidang, $value.kode_unit])?}" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <i class="fa fa-trash"></i> Hapus
+                                    </a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            {else}
+                            <tr>
+                                <td colspan="6" class="text-center">Tidak ada data unit per bidang</td>
+                            </tr>
+                            {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Unit per Bidang -->
+<div class="modal fade" id="addUnitBidangModal" tabindex="-1" role="dialog" aria-labelledby="addUnitBidangModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="addUnitBidangModalLabel">Tambah Unit per Bidang</h4>
+            </div>
+            <form method="POST" action="{?=url([ADMIN, 'asetkami', 'unitbidang'])?}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="kode_bidang">Kode Bidang:</label>
+                        <select class="form-control" id="kode_bidang" name="kode_bidang" required>
+                            <option value="">Pilih Bidang</option>
+                            <option value="01">01 - Bidang Direktur</option>
+                            <option value="02">02 - Bidang Kabag AUK</option>
+                            <option value="03">03 - Bidang Yanmed</option>
+                            <option value="04">04 - Bidang Keperawatan/Rajal</option>
+                            <option value="05">05 - Bidang Keperawatan/Ranap</option>
+                            <option value="07">06 - Bidang Yan Non Med</option>
+                            <option value="08">07 - Sub Bag Kepegawaian</option>
+                            <option value="09">08 - Sub Bag Keuangan</option>
+                            <option value="10">09 - Sub Bagian RTHH</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="nama_bidang">Nama Bidang:</label>
+                        <input type="text" class="form-control" id="nama_bidang" name="nama_bidang" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="kode_unit">Kode Unit:</label>
+                        <input type="text" class="form-control" id="kode_unit" name="kode_unit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nama_unit">Nama Unit:</label>
+                        <input type="text" class="form-control" id="nama_unit" name="nama_unit" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Unit per Bidang -->
+<div class="modal fade" id="editUnitBidangModal" tabindex="-1" role="dialog" aria-labelledby="editUnitBidangModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="editUnitBidangModalLabel">Edit Unit per Bidang</h4>
+            </div>
+            <form method="POST" action="{?=url([ADMIN, 'asetkami', 'unitbidang'])?}">
+                <div class="modal-body">
+                    <input type="hidden" id="edit_mode" name="edit_mode" value="0">
+                    <input type="hidden" id="original_kode" name="original_kode">
+                    <input type="hidden" id="original_bidang" name="original_bidang">
+                    <div class="form-group">
+                        <label for="edit_kode_bidang">Kode Bidang:</label>
+                        <select class="form-control" id="edit_kode_bidang" name="kode_bidang" required>
+                            <option value="">Pilih Bidang</option>
+                            <option value="01">01 - Bidang Direktur</option>
+                            <option value="02">02 - Bidang Kabag AUK</option>
+                            <option value="03">03 - Bidang Yanmed</option>
+                            <option value="04">04 - Bidang Keperawatan/Rajal</option>
+                            <option value="05">05 - Bidang Keperawatan/Ranap</option>
+                            <option value="06">06 - Bidang Yan Non Med</option>
+                            <option value="07">07 - Sub Bag Kepegawaian</option>
+                            <option value="08">08 - Sub Bag Keuangan</option>
+                            <option value="09">09 - Sub Bagian RTHH</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_nama_bidang">Nama Bidang:</label>
+                        <input type="text" class="form-control" id="edit_nama_bidang" name="nama_bidang" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_kode_unit">Kode Unit:</label>
+                        <input type="text" class="form-control" id="edit_kode_unit" name="kode_unit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_nama_unit">Nama Unit:</label>
+                        <input type="text" class="form-control" id="edit_nama_unit" name="nama_unit" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#unitBidangTable').DataTable({
+        "language": {
+            "url": "{?=url('assets/jscripts/dataTables-id.json')?}"
+        }
+    });
+    
+    // Mapping nama bidang
+    const bidangMapping = {
+        '01': 'Bidang Direktur',
+        '02': 'Bidang Kabag AUK',
+        '03': 'Bidang Yanmed',
+        '04': 'Bidang Keperawatan/Rajal',
+        '05': 'Bidang Keperawatan/Ranap',
+        '07': 'Bidang Yan Non Med',
+        '08': 'Sub Bag Kepegawaian',
+        '09': 'Sub Bag Keuangan',
+        '10': 'Sub Bagian RTHH'
+    };
+    
+    // Auto fill nama bidang saat kode bidang dipilih
+    $('#kode_bidang').change(function() {
+        const kodeBidang = $(this).val();
+        if (kodeBidang && bidangMapping[kodeBidang]) {
+            $('#nama_bidang').val(bidangMapping[kodeBidang]);
+        } else {
+            $('#nama_bidang').val('');
+        }
+    });
+    
+    $('#edit_kode_bidang').change(function() {
+        const kodeBidang = $(this).val();
+        if (kodeBidang && bidangMapping[kodeBidang]) {
+            $('#edit_nama_bidang').val(bidangMapping[kodeBidang]);
+        } else {
+            $('#edit_nama_bidang').val('');
+        }
+    });
+    
+    // Reset modal when closed
+    $('#addUnitBidangModal').on('hidden.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+    
+    $('#editUnitBidangModal').on('hidden.bs.modal', function () {
+        $('#edit_mode').val('0');
+        $('#original_kode').val('');
+        $('#original_bidang').val('');
+        $(this).find('form')[0].reset();
+    });
+});
+
+function editUnitBidang(kodeBidang, namaBidang, kodeUnit, namaUnit) {
+    $('#edit_mode').val('1');
+    $('#original_kode').val(kodeUnit);
+    $('#original_bidang').val(kodeBidang);
+    $('#edit_kode_bidang').val(kodeBidang);
+    $('#edit_nama_bidang').val(namaBidang);
+    $('#edit_kode_unit').val(kodeUnit);
+    $('#edit_nama_unit').val(namaUnit);
+    $('#editUnitBidangModal').modal('show');
+}
+</script>

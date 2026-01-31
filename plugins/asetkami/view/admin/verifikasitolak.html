@@ -1,0 +1,283 @@
+<style>
+    /* Badge untuk kolom Status */
+    .status-badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:9999px;
+      font-size:12px;
+      font-weight:600;
+      color:#fff;
+      background:#6b7280; /* default grey */
+    }
+    .status-badge[data-status="kirim"]{background:#22c55e} /* sky-500 */
+    .status-badge[data-status="verifikasi"]{background:#0ea5e9} /* green-500 */
+    .status-badge[data-status="ditolak"]{background:#ef4444} /* red-500 */
+
+    :root{
+    --bg-soft:#f8fafc;
+    --border-soft:#e5e7eb;
+    --text-muted:#64748b;
+    --primary:#0ea5e9;
+    --success:#10b981;
+    --warning:#f59e0b;
+    --danger:#ef4444;
+    --secondary:#6b7280;
+    }
+
+    .btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#ff4d4f 0%,#d9363e 100%);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-back:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+    filter:brightness(1.05);
+    color:#fff;
+  }
+</style>
+<div class="back" style="margin-bottom: 20px; text-align: right;">
+  <a href="{?=url([ADMIN, 'asetkami', 'manage'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{$data.title}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning">
+                            <h4><i class="fa fa-archive"></i> Total Stok di Gudang: <span class="badge badge-primary">{$data.total_stok} Unit</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="gudangTable">
+                        <thead>
+                            <tr>
+                                <!-- <th>No</th> -->
+                                <th style="text-align: center;">Kategori Barang</th>
+                                <th style="text-align: center;">Jenis Barang</th>
+                                <th style="text-align: center;">Merk</th>
+                                <th style="text-align: center;">Model/Seri</th>
+                                <th style="text-align: center;">SN</th>
+                                <th style="text-align: center;">Kelengkapan</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {if: $data.gudang}
+                            {loop: $data.gudang}
+                            <tr>
+                                <!-- <td>{$key+1}</td> -->
+                                <td>{$value.nm_kategori_barang}</td>
+                                <td>{$value.nm_jns_barang}</td>
+                                <td>{$value.merk}</td>
+                                <td>{$value.model_seri}</td>
+                                <td>{$value.sn}</td>
+                                <td>{$value.kelengkapan}</td>
+                                <td class="text-center">
+                                  <span class="status-badge" data-status="{$value.status_verifikasi}">{$value.status_verifikasi}</span>
+                                </td>
+                                <td class="text-center">
+                                  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#verifikasiModal{$value.id}">
+                                    <i class="fa fa-check"></i> Verifikasi
+                                  </button>
+                                </td>
+                            </tr>
+                            <div class="modal fade" id="verifikasiModal{$value.id}" tabindex="-1" role="dialog">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h3 class="modal-title">Verifikasi Barang</h3>
+                                        </div>
+                                        <form method="post" action="{?=url([ADMIN, 'asetkami', 'updateverifikasi'])?}" id="verifikasiForm{$value.id}">
+                                            <div class="modal-body">
+                                                <input type="hidden" name="id" value="{$value.id}">
+                                                <input type="hidden" name="redirect_url" value="{?=url([ADMIN, 'asetkami', 'detail', $data.jenis.kd_jns_barang])?}">
+                                                  <div class="form-group">
+                                                    <label>Barang:</label>
+                                                    <p><strong>{$value.merk} - {$value.model_seri} (SN: {$value.sn})</strong></p>
+                                                  </div>
+                                                  <!-- Form Generator -->
+                                                  <div class="panel panel-info">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">Data Barang Verifikasi</h4>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                    <!-- Kode Distribusi Generator -->
+                                                      <div class="row">
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Kode Barang :</label>
+                                                              <input type="text" name="kode_barang" id="kode_barang" class="form-control" value="{$value.kode_barang}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-6">
+                                                            <div class="form-group">
+                                                              <label>Jenis Barang :</label>
+                                                              <input type="text" name="kd_jns_barang" id="kd_jns_barang" class="form-control" value="{$value.nm_jns_barang}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-6">
+                                                            <div class="form-group">
+                                                              <label>Kategori Barang :</label>
+                                                              <input type="text" name="kd_kategori" id="kd_kategori" class="form-control" value="{$value.nm_kategori_barang}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-6">
+                                                            <div class="form-group">
+                                                              <label>Merk :</label>
+                                                              <input type="text" name="merk" id="merk" class="form-control" value="{$value.merk}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-6">
+                                                            <div class="form-group">
+                                                              <label>Model Seri :</label>
+                                                              <input type="text" name="model_seri" id="model_seri" class="form-control" value="{$value.model_seri}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-6">
+                                                            <div class="form-group">
+                                                              <label>Serial Number :</label>
+                                                              <input type="text" name="sn" id="sn" class="form-control" value="{$value.sn}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-6">
+                                                            <div class="form-group">
+                                                              <label>Asal Barang :</label>
+                                                              <input type="text" name="asal_barang" id="asal_barang" class="form-control" value="{$value.asal_barang}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Kelengkapan Barang :</label>
+                                                              <input type="text" name="kelengkapan" id="kelengkapan" class="form-control" value="{$value.kelengkapan}" readonly>
+                                                            </div>
+                                                          </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+
+                                                  <div class="panel panel-warning">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">Data Pengadaan Sumber Dana</h4>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                    <!-- Kode Distribusi Generator -->
+                                                      <div class="row">
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Sumber Dana :</label>
+                                                              <input type="text" name="sumber_dana" id="sumber_dana" class="form-control" value="{$value.sumber_dana}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Harga :</label>
+                                                              <input type="text" name="harga" id="harga" class="form-control" value="{?='Rp. ' . number_format($value.harga, 0, ',', '.')?}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Nomor Surat Permintaan :</label>
+                                                              <input type="text" name="no_surat_permintaan" id="no_surat_permintaan" class="form-control" value="{$value.no_surat_permintaan}" readonly>
+                                                            </div>
+                                                          </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                  <div class="panel panel-success">
+                                                    <div class="panel-heading">
+                                                        <h4 class="panel-title">Data Perusahaan/Penyedia</h4>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                    <!-- Kode Distribusi Generator -->
+                                                      <div class="row">
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Perusahaan Penyedia :</label>
+                                                              <input type="text" name="perusahaan_penyedia" id="perusahaan_penyedia" class="form-control" value="{$value.perusahaan_penyedia}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Nama Pemilik/Teknisi :</label>
+                                                              <input type="text" name="nama_pemilik_teknisi" id="nama_pemilik_teknisi" class="form-control" value="{$value.nama_pemilik_teknisi}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Kontak :</label>
+                                                              <input type="text" name="kontak" id="kontak" class="form-control" value="{$value.kontak}" readonly>
+                                                            </div>
+                                                          </div>
+                                                          <div class="col-md-12">
+                                                            <div class="form-group">
+                                                              <label>Foto :</label>
+                                                              <input type="text" name="foto" id="foto" class="form-control" value="{$value.foto}" readonly>
+                                                              {if: $value.foto}
+                                                              <div style="margin-top:10px">
+                                                                <img src="{?=url(UPLOADS.'/aset/'.$value.foto)?}" alt="Foto Barang" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:8px;">
+                                                              </div>
+                                                              {else}
+                                                              <div style="margin-top:10px;color:#6b7280">Tidak ada foto</div>
+                                                              {/if}
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                    <label>Verifikasi Barang :</label>
+                                                        <select name="status_verifikasi" id="status_verifikasi" class="form-control" required>
+                                                          <option value="">Pilih Status</option>
+                                                          <option value="kirim" {if: $value.status_verifikasi == 'kirim'}selected{/if}>Kirim</option>
+                                                          <option value="verifikasi" {if: $value.status_verifikasi == 'verifikasi'}selected{/if}>Verifikasi</option>
+                                                          <option value="ditolak" {if: $value.status_verifikasi == 'ditolak'}selected{/if}>Ditolak</option>
+                                                        </select>
+                                                    </div>
+                                                
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">Verifikasi</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {/loop}
+                            {else}
+                            <tr>
+                                <td colspan="3" class="text-center">Tidak ada data barang di gudang</td>
+                            </tr>
+                            {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#gudangTable').DataTable({
+        "language": {
+            "url": "{?=url('assets/jscripts/dataTables-id.json')?}"
+        }
+    });
+});
+</script>

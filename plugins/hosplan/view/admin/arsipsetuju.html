@@ -1,0 +1,181 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<!-- DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+<style media="screen">
+  .modern-stat-card {
+    border-radius: 12px;
+    padding: 16px 18px;
+    color:white;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .modern-stat-card.rka {
+    background: linear-gradient(135deg, #4CAF50 0%, #338937 100%);
+  }
+  
+  .modern-stat-card.rba {
+    background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%);
+  }
+  
+  .modern-stat-card.bukbel {
+    background: linear-gradient(135deg, #FFC107 0%, #F57C00 100%);
+  }
+  
+  .modern-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+  }
+  
+  .modern-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#ff4d4f 0%,#d9363e 100%);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-back:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+    filter:brightness(1.05);
+    color:#fff;
+  }
+</style>
+
+<div class="back" style="margin-bottom: 20px; text-align: right;">
+  <a href="{?=url([ADMIN, 'hosplan', 'manage'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
+</div>
+
+<div class="row stat-center" style="margin-bottom: 40px;">
+    <!-- Total Kas -->
+    <div class="col-lg-3 col-md-6">
+        <div class="modern-stat-card rka">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-clipboard fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
+                        <div class="huge" id="total-kas">{?=$jumlahRKASetuju?}</div>
+                        <div>Jumlah RKA yang Disetujui</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total RKA yang Disetujui terkini</span>
+                <span class="pull-right"><i class="fa fa-clipboard"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kas Masuk -->
+    <div class="col-lg-3 col-md-6">
+        <div class="modern-stat-card rba">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-clipboard fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
+                        <div class="huge" id="kas-masuk">{?=$jumlahRBASetuju?}</div>
+                        <div>Jumlah RBA yang Disetujui</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total RBA yang Disetujui terkini</span>
+                <span class="pull-right"><i class="fa fa-clipboard"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kas Keluar -->
+    <div class="col-lg-3 col-md-6">
+        <div class="modern-stat-card bukbel">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-book fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 1px">
+                        <div class="huge" id="kas-keluar">{?=$jumlahBukbelSetuju?}</div>
+                        <div>Jumlah BukBel yang Disetujui</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total Buku Belanja yang Disetujui terkini</span>
+                <span class="pull-right"><i class="fa fa-book"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <ul class="modules" style="padding:0;margin:0;">
+            {loop: $sub_modules}
+            <li class="module" style="margin-bottom: 20px;">
+                <div class="panel panel-default">
+                    <a href="{$value.url}" class="panel-body text-center">
+                        <div class="panel-thumb">
+                            <i class="fa fa-{$value.icon}"></i>
+                            <div class="desc">
+                                {$value.desc}
+                            </div>
+                        </div>
+                        <h4><b>{$value.name}</b></h4>
+                    </a>
+                </div>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+  $('#tabelRBA').DataTable({
+    "pageLength": 10, // default show 10 entries
+    "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+    "language": {
+      "lengthMenu": "Tampilkan _MENU_ data per halaman",
+      "zeroRecords": "Data tidak ditemukan",
+      "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+      "infoEmpty": "Tidak ada data tersedia",
+      "infoFiltered": "(disaring dari total _MAX_ data)",
+      "search": "Cari:",
+      "paginate": {
+        "first": "Pertama",
+        "last": "Terakhir",
+        "next": "›",
+        "previous": "‹"
+      }
+    }
+  });
+});
+
+</script>

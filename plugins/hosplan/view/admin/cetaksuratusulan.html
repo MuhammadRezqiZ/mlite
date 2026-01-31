@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  /* Style dasar area cetak */
+  .print-area {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    color: #000;
+  }
+  .btn-print { background: #111827; color: #fff; border: 0; border-radius: 8px; padding: 10px 14px; font-size: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .btn-print:hover { background: #1f2937; }
+
+  @media print {
+    /* Kertas A4 dengan margin nyaman (top lebih kecil) */
+    @page { size: A4; margin: 0mm 15mm 15mm; }
+
+    /* Hilangkan margin/padding default di html & body agar kop naik */
+    html, body { margin: 0 !important; padding: 0 !important; }
+
+    /* Sembunyikan elemen non-print (navbar, footer, dll) */
+    .no-print,
+    .sidebar,
+    .navbar,
+    #navbar-wrapper,
+    nav.navbar,
+    .footer,
+    .main-header,
+    .main-sidebar,
+    .control-sidebar,
+    .brand-link,
+    .content-header,
+    .content-title,
+    .icon-bar,
+    #notify,
+    .dropdown-menu,
+    .main-footer,
+    footer { display: none !important; }
+
+    /* Biarkan area surat tampil normal tanpa visibility hack */
+    .print-area { position: static; width: 100%; }
+
+    /* Matikan penambahan URL otomatis di belakang tautan saat print */
+    a[href]:after, abbr[title]:after { content: '' !important; }
+  }
+    .btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#ff4d4f 0%,#d9363e 100%);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-back:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+    filter:brightness(1.05);
+    color:#fff;
+  }
+  
+  /* Modal Styles */
+  .custom-modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+  }
+
+  .custom-modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    max-width: 600px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close-modal:hover,
+  .close-modal:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .ttd-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .ttd-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .ttd-item:hover {
+    transform: scale(1.05);
+    border-color: #007bff;
+  }
+
+  .ttd-item img {
+    max-width: 150px;
+    max-height: 100px;
+    display: block;
+    margin: 0 auto;
+  }
+</style>
+
+</head>
+<div class="back" style="margin-bottom: 20px; text-align: right;">
+  <button class="btn-print no-print" onclick="window.print()">🖨️ Print / Simpan PDF</button>
+  <button class="btn-print no-print" id="btn-sign" style="background-color: #28a745; margin-left: 5px;">✍️ TTD-Elektronik</button>
+  <a href="{?=url([ADMIN, 'hosplan', 'suratusulan'])?}" class="btn-back no-print"><i class="fa fa-arrow-left"></i>Kembali</a>
+</div>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
+<div class="wrapper">
+  <div class="content-wrapper">
+    <section class="content" >
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- Main content -->
+            <div class="print-area">
+              <!-- title row -->
+              <div class="row">
+                <div class="col-12">
+                  <div class="kop" style="font-family: 'Times New Roman', Times, serif; text-align: center; border-bottom: 3px solid #000; padding-bottom: 5px; margin-bottom: 20px;">
+                    <img src="{?= url('/plugins/hosplan/img/hst.png') ?}" alt="Logo" style="float: left; width: 70px; height: 100px; margin-left: 1px; margin-right: 1px;">
+                        <h4 style="font-size: 22px; margin-top: 1px; margin-bottom: 1px; margin-left: 1px;"><b>PEMERINTAH KABUPATEN HULU SUNGAI TENGAH</b></h4>
+                        <h4 style="font-size: 22px; margin-top: 1px; margin-bottom: 1px;"><b>DINAS KESEHATAN</b></h4>
+                        <h3 style="font-size: 19px; margin-top: 1px; margin-bottom: 1px;"><b>UPT RSUD H. DAMANHURI BARABAI</b></h3>
+                        <p style="font-size: 14px; margin-top: 1px; margin-bottom: 1px;">Jalan Murakata Nomor 4 Barabai Barat Hulu Sungai Tengah Kalimantan Selatan 71314</p>
+                        <p style="font-size: 14px; margin-top: 1px; margin-bottom: 1px;">Telp : 0811 5008080 Laman : www.rshdbarabai.com, Pos-el : rshd@hstkab.go.id</p>
+                  </div>    
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- info row -->
+              <div class="row">
+                <div class="col-12">
+                  <div class="perihal">
+                    <div class="left" style="float: left; font-family: 'Times New Roman', Times, serif; font-size: 14px; margin-left: 50px; margin-top: 20px;">
+                      <p></p> <br><br>
+                      <p>Nomor &nbsp;&nbsp;&nbsp;&nbsp;: {$suratusulan.no_surat}<br>
+                        Lampiran : {$suratusulan.lampiran}<br>
+                        Perihal &nbsp;&nbsp;&nbsp;&nbsp;: {$suratusulan.perihal}</p>
+                      </div>
+                      <div class="right" style="float: right; font-family: 'Times New Roman', Times, serif; font-size: 14px; margin-right: 50px; margin-top: 20px;">
+                         <p>Barabai, {?= dateIndonesia($suratusulan['tgl_surat']) ?}</p> <br>
+                         <p>Kepada Yth : <br>
+                         Direktur RSUD H. Damanhuri Barabai<br>
+                        &nbsp;&nbsp; di Tempat</p>
+                       </div>
+                  </div>
+               </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="isi" style="text-align: justify; margin-top: 40px; font-family: 'Times New Roman', Times, serif; font-size: 14px; margin-left: 50px; margin-right: 50px;">
+                    <div class=""> Dengan Hormat,</div>
+                    <p style="margin-left: 1px; margin-top: 1px; margin-bottom: 1px;">&nbsp;&nbsp;&nbsp;&nbsp; Sehubungan dengan penyusunan Rencana Kerja Anggaran untuk tahun 2026
+                      dan terbitnya perencanaan maka kami dari {$suratusulan.nama_unit} membuat permintaan data usulan sarana dan prasarana dan juga alat Kesehatan.
+                      Daftar alat Kesehatan dan sarana prasarana untuk {$suratusulan.nama_unit} tersebut sebagaimana terlampir.</p>
+                    <p style="margin-left: 1px; margin-top: 10px; margin-bottom: 1px;">&nbsp;&nbsp;&nbsp;&nbsp; Demikian permohonan tersebut kami sampaikan, atas pertimbangan dan perkenan Bapak kami
+                    ucapkan terima kasih.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="ttd" style="float: right; font-family: 'Times New Roman', Times, serif; font-size: 14px; margin-right: 50px; margin-top: 40px; text-align: center;">
+                    <div class="">Yang memohon,</div>
+                    <p>{$suratusulan.jabatan}</p>
+                    <div id="qr-code-container" style="display: flex; justify-content: center; align-items: center; min-height: 80px; margin: 5px 0;">
+                        <span id="qr-placeholder"><br><br><br></span>
+                    </div>
+                    <p><u>{$suratusulan.nama_pegawai}</u><br>
+                          NIP. {$suratusulan.nip}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<!-- Modal Structure -->
+<div id="ttdModal" class="custom-modal">
+  <div class="custom-modal-content">
+    <span class="close-modal">&times;</span>
+    <h3>Pilih Tanda Tangan</h3>
+    <div class="ttd-grid">
+      {loop: $ttd_files}
+        <div class="ttd-item" data-src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}">
+           <img src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}" alt="{$value}">
+           <p style="margin-top: 5px; font-size: 12px;">{$value}</p>
+        </div>
+      {/loop}
+    </div>
+  </div>
+</div>
+
+<script src="{?= url('assets/jscripts/jquery.min.js') ?}"></script>
+<script src="{?= url('assets/jscripts/qrcode.js') ?}"></script>
+<script src="{?= url('assets/jscripts/jquery.qrcode.js') ?}"></script>
+<script>
+  function hitungJumlah() {
+  let volume = parseFloat($('#volume').val()) || 0;
+  let harga = parseFloat($('#harga').val()) || 0;
+  let jumlah = volume * harga;
+  $('#jumlah').val(jumlah);
+  }
+
+  // jalankan perhitungan setiap kali harga atau volume berubah
+  $('#volume, #harga').on('input', hitungJumlah);
+  
+  $(document).ready(function() {
+      var modal = $('#ttdModal');
+      var span = $('.close-modal');
+
+      $('#btn-sign').on('click', function() {
+           modal.show();
+      });
+
+      span.on('click', function() {
+          modal.hide();
+      });
+
+      $(window).on('click', function(event) {
+          if ($(event.target).is(modal)) {
+              modal.hide();
+          }
+      });
+
+      $('.ttd-item').on('click', function() {
+          var src = $(this).data('src');
+          if(!confirm('Gunakan tanda tangan ini?')) return;
+
+          $('#qr-placeholder').hide();
+          // Clear previous content and add image
+          $('#qr-code-container').html('<img src="' + src + '" style="height: 80px; width: auto;">');
+          
+          modal.hide();
+          $('#btn-sign').hide();
+      });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  .form-group label { font-weight: 500; margin-bottom: 6px; }
+  .select2-container .select2-selection--single { height: 38px; border-radius: 6px; border: 1px solid #ced4da; }
+  .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 38px; padding-left: 10px; }
+  .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+</style>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Edit Upload Usulan Buku Belanja</h3>
+  </div>
+
+  <div class="card-body">
+    <form action="{?=url([ADMIN, 'hosplan', 'updateuploadbukbel'])?}" method="post" enctype="multipart/form-data">
+      <input type="hidden" id="id_usulan" name="id_usulan" value="{$uploadbukbel.id_usulan}">
+
+        <div class="row">
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="no_surat">Nomor Surat</label>
+            <input id="no_surat" type="text" class="form-control" name="no_surat" placeholder="Masukkan Nomor Surat" value="{$uploadbukbel.no_surat}" required>
+          </div>
+
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="id_rba">Pengirim</label>
+            <select id="id_pptk" class="form-control select2" name="id_pptk" required>
+              <option value="">Pilih PPTK</option>
+              {loop: $pptk}
+              <option value="{$value.id_pptk}" {if: $value.id_pptk == $uploadbukbel.id_pptk}selected{/if}>{$value.nama_pptk}</option>
+              {/loop}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="tanggal_usulan">Tanggal Surat</label>
+            <input id="tanggal_usulan" type="date" class="form-control" name="tanggal_usulan" value="{$uploadbukbel.tanggal_usulan}" required>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="id_jenis_usulan">Jenis Usulan</label>
+            <select id="id_jenis_usulan" class="form-control" name="id_jenis_usulan" required>
+              <option value="">Pilih Jenis Usulan</option>
+              {loop: $jenis}
+              <option value="{$value.id_jenis_usulan}" {if: $value.id_jenis_usulan == $uploadbukbel.id_jenis_usulan}selected{/if}>{$value.jenis_usulan}</option>
+              {/loop}
+            </select>
+          </div>
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="id_status_surat">Status Usulan</label>
+            <select id="id_status_surat" class="form-control" name="id_status_surat" required>
+              <option value="">Pilih Status Usulan</option>
+              {loop: $status}
+              <option value="{$value.id_status_surat}" {if: $value.id_status_surat == $uploadbukbel.id_status_surat}selected{/if}>{$value.status_surat}</option>
+              {/loop}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="perihal">Perihal</label>
+            <input id="perihal" type="text" class="form-control" name="perihal" value="{$uploadbukbel.perihal}" placeholder="Masukkan Perihal" required>
+          </div>
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="file_usulan">Upload File (PDF/DOC)</label>
+            <input id="file_usulan" type="file" class="form-control" name="file_usulan" accept=".pdf,.doc,.docx">
+            <small id="file_usulan_error" class="text-danger"></small>
+            {if: !empty($uploadbukbel.file_usulan)}
+            <small class="text-muted">File saat ini:
+              {if: !empty($uploadbukbel.file_url)}
+                <a href="{?= url($uploadbukbel.file_url) ?}" target="_blank" rel="noopener noreferrer">{$uploadbukbel.file_usulan}</a>
+              {/if}
+              {if: empty($uploadbukbel.file_url)}{$uploadbukbel.file_usulan}{/if}
+            </small>
+            {/if}
+        </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 mb-3" style="margin-top: 12px;">
+                <label for="keterangan">Keterangan</label>
+                <input type="text" class="form-control" id="keterangan" name="keterangan" value="{$uploadbukbel.keterangan}" placeholder="Masukkan Keterangan" required>
+            </div>
+        </div>
+
+        <div class="modal-footer justify-content-between">
+            <a href="{?=url([ADMIN, 'hosplan', 'uploadusulanbukbel'], ['id_pptk' => $uploadbukbel.id_pptk])?}" class="btn btn-secondary">Kembali</a>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+$(document).ready(function(){
+  if ($.fn.select2) { $('.select2').select2({ placeholder: 'Cari...', width: '100%' }); }
+  var MAX_FILE_SIZE = 5 * 1024 * 1024;
+  var $fileInput = $('#file_usulan');
+  var $errorEl = $('#file_usulan_error');
+  var $submitBtn = $('button[type="submit"]');
+  function showSizeError() { $errorEl.text('Ukuran file terlalu besar (maks 5 MB).'); $submitBtn.prop('disabled', true); }
+  function clearError() { $errorEl.text(''); $submitBtn.prop('disabled', false); }
+  $fileInput.on('change', function(){ clearError(); var f = this.files && this.files[0] ? this.files[0] : null; if (f && f.size > MAX_FILE_SIZE) { showSizeError(); $fileInput.val(''); } });
+  $('form').on('submit', function(e){ clearError(); var f = $fileInput[0].files && $fileInput[0].files[0] ? $fileInput[0].files[0] : null; if (f && f.size > MAX_FILE_SIZE) { e.preventDefault(); showSizeError(); } });
+  try { var params = new URLSearchParams(window.location.search); if (params.get('error') === 'size') { showSizeError(); } } catch(err) {}
+});
+</script>

@@ -1,0 +1,251 @@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+    .btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#ff4d4f 0%,#d9363e 100%);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-back:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+    filter:brightness(1.05);
+    color:#fff;
+  }
+  .section-title{display:flex;align-items:center;justify-content:left;padding:10px 12px;border-radius:6px;background:#f8f9fa;color:#0f172a;font-weight:600;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:.4px;border-left:4px solid #0ea5e9}
+  .form-card{border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fff;margin-top:12px}
+  .table.form-table{width:100%;margin:0}
+  .table.form-table tr{border-bottom:1px dashed #e5e7eb}
+  .table.form-table tr:last-child{border-bottom:0}
+  .label-cell{width:220px;color:#010101;background:#f3f3f3;font-weight:600;vertical-align:middle}
+  .control-cell .form-control{height:40px;border-radius:6px;border-color:#e5e7eb}
+  .control-cell textarea.form-control{min-height:80px}
+  .select2-container .select2-selection--single{height:40px;border-radius:6px;border-color:#e5e7eb}
+  .select2-selection__rendered{line-height:40px!important}
+  .select2-selection__arrow{height:40px!important}
+</style>
+<div class="back" style="margin-bottom: 20px; text-align: right;">
+  <a href="{?=url([ADMIN, 'asetkami', 'manage'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{$data.title}</h3>
+            </div>
+            <div class="panel-body">
+                <form method="post" action="{?=url([ADMIN, 'asetkami', 'tambah'])?}" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title" style="justify-content: center;">FORM PEMERIKSAAN BARANG</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-card">
+                    <table class="table form-table">
+                        <tr>
+                            <td class="label-cell">&nbsp;Tanggal Pengadaan</td>
+                            <td class="control-cell">
+                                <!-- <label for="tanggal_barang"></label> -->
+                                <input type="date" id="tanggal_barang" name="tanggal_barang" class="form-control" required>
+                            </td>
+                        </tr>
+                    </table>
+                    </div>
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-12">
+                            <div class="section-title">1. Data Barang</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-card">
+                    <table class="table form-table">
+                        <tr>
+                            <td class="label-cell">&nbsp;Kategori Barang</td>
+                            <td class="control-cell">
+                                <select name="kd_kategori" class="form-control select2" required>
+                                    <option value="">Pilih Kategori</option>
+                                    {loop: $data.kategori}
+                                    <option value="{$value.kd_kategori}">{$value.nm_kategori_barang}</option>
+                                    {/loop}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Jenis Barang</td>
+                            <td class="control-cell">
+                                <select name="kd_jns_barang" class="form-control select2" required>
+                                    <option value="">Pilih Jenis</option>
+                                    {loop: $data.jenis}
+                                    <option value="{$value.kd_jns_barang}">{$value.nm_jns_barang}</option>
+                                    {/loop}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Merk</td>
+                            <td class="control-cell"><input type="text" name="merk" class="form-control" placeholder="Contoh: Asus" required></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Model/Seri</td>
+                            <td class="control-cell"><input type="text" name="model_seri" class="form-control" placeholder="Contoh: Zenbook 14" required></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;SN</td>
+                            <td class="control-cell"><input type="text" name="sn" class="form-control" placeholder="Serial Number" required></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Kelengkapan</td>
+                            <td class="control-cell"><textarea name="kelengkapan" class="form-control" rows="3" placeholder="Contoh: Laptop, Charger, Mouse, Stylus, cover, Buku garansi"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Asal Barang</td>
+                            <td class="control-cell">
+                                <select name="asal_barang" class="form-control select2" id="asal_barang" required>
+                                    <option value="">Pilih Asal Barang</option>
+                                    <option value="Pengadaan">Pengadaan</option>
+                                    <option value="Hibah">Hibah</option>
+                                    <option value="Bantuan">Bantuan</option>
+                                    <option value="Sumbangan">Sumbangan</option>
+                                    <option value="dll">Lainnya</option>
+                                </select>
+                                <!-- <input type="text" name="asal_barang_lainnya" id="asal_barang_lainnya" class="form-control" placeholder="Sebutkan asal barang lainnya" style="margin-top: 10px; display: none;"> -->
+                            </td>
+                        </tr>
+                        <input type="hidden" name="status_verifikasi" class="form-control" value="kirim">
+                    </table>
+                    </div>
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-12">
+                            <div class="section-title">2. Data Pengadaan Sumber Dana</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-card">
+                    <table class="table form-table">
+                        <tr>
+                            <td class="label-cell">&nbsp;Sumber Dana</td>
+                            <td class="control-cell">
+                                <select name="sumber_dana" class="form-control select2" id="sumber_dana" required>
+                                    <option value="">Pilih Sumber Dana</option>
+                                    <option value="BLUD">BLUD</option>
+                                    <option value="APBD">APBD</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                                <!-- <input type="text" name="sumber_dana" id="sumber_dana" class="form-control" placeholder="Sebutkan sumber dana lainnya" style="margin-top: 10px; display: none;"> -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Harga</td>
+                            <td class="control-cell"><input type="text" name="harga" id="harga" class="form-control" placeholder="0"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;No Surat Permintaan</td>
+                            <td class="control-cell"><input type="text" name="no_surat_permintaan" class="form-control"></td>
+                        </tr>
+                    </table>
+                    </div>
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-12">
+                            <div class="section-title">3. Perusahaan/Penyedia</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-card">
+                    <table class="table form-table">
+                        <tr>
+                            <td class="label-cell">&nbsp;Nama Pemilik/Teknisi</td>
+                            <td class="control-cell"><input type="text" name="nama_pemilik_teknisi" class="form-control" placeholder="Contoh: La Tanza Marjun"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Kontak</td>
+                            <td class="control-cell"><input type="text" name="kontak" class="form-control" placeholder="Contoh: 0822****"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Perusahaan/Penyedia</td>
+                            <td class="control-cell"><input type="text" name="perusahaan_penyedia" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">&nbsp;Upload Foto</td>
+                            <td class="control-cell"><input type="file" name="foto" class="form-control" accept="image/*"></td>
+                        </tr>
+                    </table>
+                    </div>
+                    
+                    <!-- <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-12">
+                            <div style="background-color: #ffc107; padding: 10px; text-align: center; margin-bottom: 10px;">
+                                <strong>upload Foto</strong>
+                            </div>
+                            <input type="file" name="foto" class="form-control" accept="image/*">
+                        </div>
+                    </div> -->
+                    
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-primary">SIMPAN</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+  $('.select2').select2({
+    width: '100%',
+    language: {
+      inputTooShort: function() {
+        return "Ketik minimal 3 huruf untuk mencari";
+      },
+      noResults: function() {
+        return "Tidak ada hasil ditemukan";
+      }
+    }
+  });
+
+  // Format Rupiah untuk input harga
+  $('#harga').on('keyup', function() {
+      var value = $(this).val().replace(/[^,\d]/g, '').toString();
+      var split = value.split(',');
+      var sisa = split[0].length % 3;
+      var rupiah = split[0].substr(0, sisa);
+      var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+      if (ribuan) {
+          var separator = sisa ? '.' : '';
+          rupiah += separator + ribuan.join('.');
+      }
+
+      rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+      $(this).val(rupiah);
+  });
+});
+function toggleAsalBarangInput() {
+    var select = document.getElementById('asal_barang');
+    var input = document.getElementById('asal_barang_lainnya');
+    
+    if (select.value === 'dll') {
+        input.style.display = 'block';
+        input.required = true;
+    } else {
+        input.style.display = 'none';
+        input.required = false;
+        input.value = '';
+    }
+}
+</script>

@@ -1,0 +1,367 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{$data.title}</h3>
+                <div class="panel-options">
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#distribusiModal">
+                        <i class="fa fa-plus"></i> Tambah Distribusi
+                    </button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="distribusiTable">
+                        <thead>
+                            <tr>
+                                <th>Kode Distribusi</th>
+                                <th>Barang</th>
+                                <th>Status</th>
+                                <th>Bidang</th>
+                                <th>Unit/Ruangan</th>
+                                <th>Tanggal Distribusi</th>
+                                <th>Petugas</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {if: $data.distribusi}
+                            {loop: $data.distribusi}
+                            <tr>
+                                <td>{$value.kd_distribusi}</td>
+                                <td>{$value.merk} {$value.model_seri}</td>
+                                <td>
+                                    {if: $value.status == '1'}
+                                    <span class="badge badge-success">Di Gudang</span>
+                                    {else}
+                                    <span class="badge badge-warning">Didistribusi</span>
+                                    {/if}
+                                </td>
+                                <td>{$value.kode_bidang}</td>
+                                <td>{$value.kode_unit}</td>
+                                <td>{$value.tanggal_distribusi}</td>
+                                <td>{$value.petugas}</td>
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-sm" data-id="{$value.kd_distribusi}" onclick="editDistribusi(this)">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                    <a href="{?=url([ADMIN, 'asetkami', 'delete_distribusi', $value.kd_distribusi])?}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">
+                                        <i class="fa fa-trash"></i> Hapus
+                                    </a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            {else}
+                            <tr>
+                                <td colspan="6" class="text-center">Tidak ada data distribusi</td>
+                            </tr>
+                            {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah/Edit Distribusi -->
+<div class="modal fade" id="distribusiModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="distribusiModalTitle">Tambah Distribusi Barang</h4>
+            </div>
+            <form method="post" action="{?=url([ADMIN, 'asetkami', 'distribusi'])?}" id="distribusiForm">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="id">
+                    
+                    <!-- Kode Distribusi Generator -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Kode Distribusi (Auto Generate):</label>
+                                <input type="text" name="kd_distribusi" id="kd_distribusi" class="form-control" readonly style="background-color: #f5f5f5;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Generator -->
+                    <div class="panel panel-info" id="generatorPanel">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">Generator Kode Distribusi</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row" id="intraEktraRow">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Intra/Ektra:</label>
+                                        <select name="intra_ektra" id="intra_ektra" class="form-control" required>
+                                            <option value="">Pilih Intra/Ektra</option>
+                                            <option value="01">Intra (01)</option>
+                                            <option value="02">Ektra (02)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Sumber:</label>
+                                        <select name="sumber" id="sumber" class="form-control" required>
+                                            <option value="">Pilih Sumber</option>
+                                            <option value="00">Pusat (00)</option>
+                                            <option value="11">Provinsi (11)</option>
+                                            <option value="12">Kabupaten (12)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Alert untuk distribusi ulang -->
+                            <div class="alert alert-info" id="returnAlert" style="display: none;">
+                                <i class="fa fa-info-circle"></i> <strong>Distribusi Ulang:</strong> Barang ini pernah didistribusi sebelumnya. Kode distribusi akan menggunakan kode yang sama.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Bidang:</label>
+                                        <select name="bidang" id="bidang" class="form-control" required>
+                                               <option value="">Pilih Bidang</option>
+                                               {loop: $data.bidang}
+                                               <option value="{$value.kode_bidang}">{$value.nama_bidang} ({$value.kode_bidang})</option>
+                                               {/loop}
+                                           </select>
+                                    </div>
+                                <!-- </div> -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Unit/Ruangan:</label>
+                                        <select name="unit_ruangan" id="unit_ruangan" class="form-control" required>
+                                               <option value="">Pilih Unit/Ruangan</option>
+                                                {loop: $data.unit}
+                                                <option value="{$value.kode_unit}" data-bidang="{$value.kode_bidang}">{$value.nama_unit}</option>
+                                                {/loop}
+                                           </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Data Distribusi -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Barang:</label>
+                                <select name="barang_id" id="barang_id" class="form-control" required>
+                                    <option value="">Pilih Barang</option>
+                                    {if: $data.barang}
+                                    {loop: $data.barang}
+                                    <option value="{$value.id}">{$value.merk} {$value.model_seri} (Stok: {$value.stok})</option>
+                                    {/loop}
+                                    {/if}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Keterangan:</label>
+                                <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan distribusi (opsional)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Petugas:</label>
+                                <input type="text" name="petugas" id="petugas" class="form-control" placeholder="Nama petugas (opsional)">
+                                <small class="text-muted">Kosongkan untuk menggunakan user yang sedang login</small>
+                                    {/loop}
+                                    {/if}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Petugas:</label>
+                                <input type="text" name="petugas" id="petugas" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Keterangan:</label>
+                        <textarea name="keterangan" id="keterangan" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#distribusiTable').DataTable({
+        "language": {
+            "url": "assets/jscripts/dataTables-id.json"
+        }
+    });
+    
+    // Reset modal when closed
+    $('#distribusiModal').on('hidden.bs.modal', function () {
+        $('#distribusiForm')[0].reset();
+        $('#id').val('');
+        $('#distribusiModalTitle').text('Tambah Distribusi Barang');
+        $('#submitBtn').text('Simpan');
+        $('#kd_distribusi').val('');
+        $('#unit_ruangan').empty().append('<option value="">Pilih Unit/Ruangan</option>');
+    });
+    
+    // Update unit/ruangan dropdown when bidang changes
+    $('#bidang').change(function() {
+        const bidangValue = $(this).val();
+        const unitSelect = $('#unit_ruangan');
+        
+        // Reset dropdown
+        unitSelect.find('option').hide();
+        unitSelect.find('option:first').show(); // Show "Pilih Unit/Ruangan" option
+        unitSelect.val('');
+        
+        if (bidangValue) {
+            // Show only units that match the selected bidang
+            unitSelect.find('option[data-bidang="' + bidangValue + '"]').show();
+        } else {
+            // Show all units if no bidang selected
+            unitSelect.find('option').show();
+        }
+        
+        generateKodeDistribusi();
+    });
+    
+    // Generate kode distribusi when any dropdown changes
+    $('#intra_ektra, #sumber, #bidang, #unit_ruangan').change(function() {
+        generateKodeDistribusi();
+    });
+    
+    // Check barang return status when barang changes
+    $('#barang_id').change(function() {
+        const barangId = $(this).val();
+        if (barangId) {
+            checkBarangReturn(barangId);
+        } else {
+            resetFormToNormal();
+        }
+    });
+    
+    // Initialize unit dropdown on page load
+    $(document).ready(function() {
+        // Hide all unit options initially except the first one
+        $('#unit_ruangan option:not(:first)').hide();
+    });
+    
+    function generateKodeDistribusi() {
+        // Jika ini adalah distribusi ulang, gunakan kode yang sudah ada
+        if ($('#returnAlert').is(':visible')) {
+            const existingKode = $('#kd_distribusi').data('existing-kode');
+            if (existingKode) {
+                $('#kd_distribusi').val(existingKode);
+                $('#kd_distribusi').attr('placeholder', 'Menggunakan kode distribusi yang sama');
+                return;
+            }
+        }
+        
+        const intraEktra = $('#intra_ektra').val();
+        const sumber = $('#sumber').val();
+        const bidang = $('#bidang').val();
+        const unitRuangan = $('#unit_ruangan').val();
+        
+        if (intraEktra && sumber && bidang && unitRuangan) {
+            const tahun = new Date().getFullYear();
+
+            // Padding 2 digit untuk setiap segmen (kecuali tahun & urutan)
+            const segIntra  = String(intraEktra).padStart(2, '0');
+            const segSumber = String(sumber).padStart(2, '0');
+            const segBidang = String(bidang).padStart(2, '0');
+            const segUnit   = String(unitRuangan).padStart(2, '0');
+            
+            // Preview kode distribusi (urutan akan di-generate oleh server sebagai 3 digit)
+            const kodePreview = segIntra + '.' + segSumber + '.' + segBidang + '.' + segUnit + '.' + tahun + '.XXX';
+            $('#kd_distribusi').val(kodePreview);
+            $('#kd_distribusi').attr('placeholder', 'Kode akan di-generate otomatis saat menyimpan');
+        } else {
+            $('#kd_distribusi').val('');
+            $('#kd_distribusi').attr('placeholder', 'Lengkapi form untuk preview kode');
+        }
+    }
+    
+    function checkBarangReturn(barangId) {
+        $.ajax({
+            url: '{?=url([ADMIN, "asetkami", "checkbarangreturn"])?}',
+            type: 'GET',
+            data: { barang_id: barangId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    if (response.is_return_barang) {
+                        // Barang adalah distribusi ulang
+                        showReturnMode(response.kd_distribusi);
+                    } else {
+                        // Barang baru
+                        resetFormToNormal();
+                    }
+                }
+            },
+            error: function() {
+                console.log('Error checking barang return status');
+                resetFormToNormal();
+            }
+        });
+    }
+    
+    function showReturnMode(kdDistribusi) {
+        // Sembunyikan field intra/ektra dan sumber
+        $('#intraEktraRow').hide();
+        $('#intra_ektra, #sumber').removeAttr('required');
+        
+        // Tampilkan alert distribusi ulang
+        $('#returnAlert').show();
+        
+        // Set kode distribusi yang sudah ada
+        $('#kd_distribusi').val(kdDistribusi);
+        $('#kd_distribusi').data('existing-kode', kdDistribusi);
+        $('#kd_distribusi').attr('placeholder', 'Menggunakan kode distribusi yang sama');
+    }
+    
+    function resetFormToNormal() {
+        // Tampilkan kembali field intra/ektra dan sumber
+        $('#intraEktraRow').show();
+        $('#intra_ektra, #sumber').attr('required', 'required');
+        
+        // Sembunyikan alert distribusi ulang
+        $('#returnAlert').hide();
+        
+        // Reset kode distribusi
+        $('#kd_distribusi').val('');
+        $('#kd_distribusi').removeData('existing-kode');
+        $('#kd_distribusi').attr('placeholder', 'Lengkapi form untuk preview kode');
+        
+        // Generate kode distribusi normal
+        generateKodeDistribusi();
+    }
+});
+
+function editDistribusi(button) {
+    // Implementation for edit functionality
+    $('#distribusiModalTitle').text('Edit Distribusi Barang');
+    $('#submitBtn').text('Update');
+    $('#distribusiModal').modal('show');
+}
+</script>

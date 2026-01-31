@@ -1,0 +1,121 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{$data.title}</h3>
+                <div class="panel-options">
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#kategoriModal">
+                        <i class="fa fa-plus"></i> Tambah Kategori
+                    </button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="kategoriTable">
+                        <thead>
+                            <tr>
+                                <th>Nama Kategori</th>
+                                <th>Kode Kategori Barang</th>
+                                <th>Deskripsi</th>
+                              <!--<th>Tanggal Dibuat</th>-->
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {if: $data.kategori}
+                            {loop: $data.kategori}
+                            <tr>
+                                <td>{$value.nm_kategori_barang}</td>
+                                <td>{$value.kd_kategori}</td>
+                                <td>{$value.deskripsi}</td>
+                               <!-- <td>{$value.created_at}</td>-->
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-sm" data-kd_kategori="{$value.kd_kategori}" data-nm_kategori_barang="{$value.nm_kategori_barang}" data-deskripsi="{$value.deskripsi}" onclick="editKategori(this)">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </button>
+                                    <a href="{?=url([ADMIN, 'asetkami', 'delete_kategori', $value.kd_kategori])?}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">
+                                        <i class="fa fa-trash"></i> Hapus
+                                    </a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            {else}
+                            <tr>
+                                <td colspan="5" class="text-center">Tidak ada data kategori barang</td>
+                            </tr>
+                            {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah/Edit Kategori -->
+<div class="modal fade" id="kategoriModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="kategoriModalTitle">Tambah Kategori Barang</h4>
+            </div>
+            <form method="post" action="{?=url([ADMIN, 'asetkami', 'kategori'])?}" id="kategoriForm">
+                <div class="modal-body">
+                    <input type="hidden" name="edit_mode" id="edit_mode" value="0">
+                    <input type="hidden" name="original_kode" id="original_kode">
+                    <div class="form-group">
+                        <label>Kode Kategori:</label>
+                        <input type="text" name="kd_kategori" id="kd_kategori" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Kategori:</label>
+                        <input type="text" name="nm_kategori_barang" id="nm_kategori_barang" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi:</label>
+                        <input type="text" name="deskripsi" id="deskripsi" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#kategoriTable').DataTable({
+        "language": {
+            "url": "assets/jscripts/dataTables-id.json"
+        }
+    });
+    
+    // Reset modal when closed
+    $('#kategoriModal').on('hidden.bs.modal', function () {
+        $('#kategoriForm')[0].reset();
+        $('#edit_mode').val('0');
+        $('#original_kode').val('');
+        $('#kategoriModalTitle').text('Tambah Kategori Barang');
+        $('#submitBtn').text('Simpan');
+    });
+});
+
+function editKategori(button) {
+    var kd_kategori = $(button).data('kd_kategori');
+    var nm_kategori_barang = $(button).data('nm_kategori_barang');
+    var deskripsi = $(button).data('deskripsi');
+    
+    $('#edit_mode').val('1');
+    $('#original_kode').val(kd_kategori);
+    $('#kd_kategori').val(kd_kategori);
+    $('#nm_kategori_barang').val(nm_kategori_barang);
+    $('#deskripsi').val(deskripsi);
+    $('#kategoriModalTitle').text('Edit Kategori Barang');
+    $('#submitBtn').text('Update');
+    $('#kategoriModal').modal('show');
+}
+</script>

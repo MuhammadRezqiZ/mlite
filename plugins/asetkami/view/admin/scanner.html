@@ -1,0 +1,284 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-qrcode"></i> Scanner QR Code Informasi Barang</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="scanner-container">
+                            <h4>Kamera Scanner</h4>
+                            <div id="scanner-area">
+                                <video id="video" width="100%" height="300" style="border: 2px solid #ddd; border-radius: 5px;"></video>
+                                <canvas id="canvas" style="display: none;"></canvas>
+                            </div>
+                            <div class="text-center" style="margin-top: 10px;">
+                                <button id="startScan" class="btn btn-success"><i class="fa fa-camera"></i> Mulai Scan</button>
+                                <button id="stopScan" class="btn btn-danger" style="display: none;"><i class="fa fa-stop"></i> Stop Scan</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="result-container">
+                            <h4>Hasil Scan</h4>
+                            <div id="scan-result" class="well">
+                                <p class="text-muted"><i class="fa fa-info-circle"></i> Arahkan kamera ke QR Code kode distribusi untuk memulai scan.</p>
+                            </div>
+                            
+                            <div class="manual-input" style="margin-top: 15px;">
+                                <h5>Input Manual Kode Distribusi</h5>
+                                <div class="input-group">
+                                    <input type="text" id="manual-code" class="form-control" placeholder="Masukkan kode distribusi...">
+                                    <span class="input-group-btn">
+                                        <button id="manual-search" class="btn btn-primary"><i class="fa fa-search"></i> Cari</button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div id="barang-info" style="display: none;">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">Informasi Barang</h4>
+                                    </div>
+                                    <div class="panel-body" id="barang-detail">
+                                        <!-- Detail barang akan ditampilkan di sini -->
+                                    </div>
+                                    <div class="panel-footer">
+                                        <button id="toggleRiwayat" class="btn btn-info"><i class="fa fa-history"></i> Lihat Riwayat</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Riwayat Barang -->
+                                <div id="riwayat-container" style="display: none; margin-top: 15px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">Riwayat Distribusi</h4>
+                                        </div>
+                                        <div class="panel-body" id="riwayat-content">
+                                            <div class="text-center"><i class="fa fa-spinner fa-spin"></i> Memuat riwayat...</div>
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button id="cetakPDF" class="btn btn-danger"><i class="fa fa-print"></i> Cetak PDF</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include QR Code Scanner Library -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+<script>
+let video, canvas, context;
+let scanning = false;
+let scanInterval;
+
+$(document).ready(function() {
+    video = document.getElementById('video');
+    canvas = document.getElementById('canvas');
+    context = canvas.getContext('2d');
+    
+    $('#startScan').click(function() {
+        startScanning();
+    });
+    
+    $('#stopScan').click(function() {
+        stopScanning();
+    });
+    
+    $(document).on('click', '#toggleRiwayat', function() {
+        const $container = $('#riwayat-container');
+        const $button = $(this);
+        
+        if ($container.is(':visible')) {
+            $container.hide();
+            $button.html('<i class="fa fa-history"></i> Lihat Riwayat').addClass('btn-primary').removeClass('btn-danger');
+        } else {
+            const kodeBarang = $('#cetakPDF').data('kode-barang');
+            if (kodeBarang) {
+                loadRiwayat(kodeBarang);
+            }
+            $button.html('<i class="fa fa-eye-slash"></i> Tutup Riwayat').addClass('btn-danger').removeClass('btn-primary');
+        }
+    });
+    
+    $(document).on('click', '#cetakPDF', function() {
+        const kodeBarang = $(this).data('kode-barang');
+        if (kodeBarang) {
+            window.open('{?=url(["asetkami", "cetakriwayat"])?}?kode_barang=' + kodeBarang, '_blank');
+        }
+    });
+    
+    // Manual search functionality
+    $('#manual-search').click(function() {
+        const code = $('#manual-code').val().trim();
+        if (code) {
+            processQRCode(code);
+            $('#manual-code').val(''); // Clear input after search
+        } else {
+            alert('Masukkan kode distribusi terlebih dahulu');
+        }
+    });
+    
+    // Enter key for manual search
+    $('#manual-code').keypress(function(e) {
+        if (e.which == 13) {
+            $('#manual-search').click();
+        }
+    });
+});
+
+function startScanning() {
+    navigator.mediaDevices.getUserMedia({ 
+        video: { 
+            facingMode: 'environment', // Gunakan kamera belakang jika tersedia
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+        } 
+    })
+    .then(function(stream) {
+        video.srcObject = stream;
+        video.play();
+        scanning = true;
+        
+        $('#startScan').hide();
+        $('#stopScan').show();
+        $('#scan-result').html('<p class="text-info"><i class="fa fa-spinner fa-spin"></i> Scanning... Arahkan kamera ke QR Code</p>');
+        
+        // Mulai scanning setelah video ready
+        video.addEventListener('loadedmetadata', function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            scanInterval = setInterval(scanQRCode, 100); // Scan setiap 100ms
+        });
+    })
+    .catch(function(err) {
+        console.error('Error accessing camera:', err);
+        $('#scan-result').html('<p class="text-danger"><i class="fa fa-exclamation-triangle"></i> Error: Tidak dapat mengakses kamera. Pastikan browser memiliki izin kamera.</p>');
+    });
+}
+
+function stopScanning() {
+    scanning = false;
+    
+    if (scanInterval) {
+        clearInterval(scanInterval);
+    }
+    
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+    }
+    
+    $('#startScan').show();
+    $('#stopScan').hide();
+    $('#scan-result').html('<p class="text-muted"><i class="fa fa-info-circle"></i> Scanning dihentikan. Klik "Mulai Scan" untuk memulai lagi.</p>');
+}
+
+function scanQRCode() {
+    if (!scanning || video.readyState !== video.HAVE_ENOUGH_DATA) {
+        return;
+    }
+    
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+    
+    if (code) {
+        console.log('QR Code detected:', code.data);
+        processQRCode(code.data);
+        stopScanning();
+    }
+}
+
+function processQRCode(qrData) {
+    $('#scan-result').html('<p class="text-success"><i class="fa fa-check"></i> QR Code terdeteksi: <strong>' + qrData + '</strong></p>');
+    
+    // Cari barang berdasarkan kode distribusi menggunakan endpoint decode
+    $.ajax({
+        url: '{?=url([ADMIN, "asetkami", "decode"])?}',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ kd_distribusi: qrData }),
+        success: function(response) {
+            if (response.success) {
+                displayBarangInfo(response.data);
+            } else {
+                $('#scan-result').html('<p class="text-warning"><i class="fa fa-exclamation-triangle"></i> ' + (response.message || 'Barang tidak ditemukan untuk kode distribusi: ' + qrData) + '</p>');
+            }
+        },
+        error: function() {
+            $('#scan-result').html('<p class="text-danger"><i class="fa fa-exclamation-triangle"></i> Error: Gagal mencari data barang.</p>');
+        }
+    });
+}
+
+function displayBarangInfo(barang) {
+    const html = `
+        <table class="table table-bordered">
+            <tr><td><strong>Kode Distribusi</strong></td><td>${barang.kd_distribusi}</td></tr>
+            <tr><td><strong>Nama Barang</strong></td><td>${barang.nm_jns_barang}</td></tr>
+            <tr><td><strong>Kategori</strong></td><td>${barang.nm_kategori_barang}</td></tr>
+            <tr><td><strong>Merk</strong></td><td>${barang.merk || '-'}</td></tr>
+            <tr><td><strong>Model/Seri</strong></td><td>${barang.model_seri || '-'}</td></tr>
+            <tr><td><strong>Lokasi Saat Ini</strong></td><td>${barang.lokasi_saat_ini}</td></tr>
+            <tr><td><strong>Tanggal Distribusi</strong></td><td>${barang.tanggal_distribusi}</td></tr>
+        </table>
+    `;
+    
+    $('#barang-detail').html(html);
+    $('#cetakPDF').data('kode-barang', barang.kode_barang);
+    $('#barang-info').show();
+    
+    // Reset riwayat container and button
+    $('#riwayat-container').hide();
+                 $('#toggleRiwayat').html('<i class="fa fa-history"></i> Lihat Riwayat').addClass('btn-primary').removeClass('btn-danger');
+    
+    $('#scan-result').html('<p class="text-success"><i class="fa fa-check"></i> Barang ditemukan! Detail ditampilkan di bawah.</p>');
+}
+
+function loadRiwayat(kodeBarang) {
+    $('#riwayat-container').show();
+    $('#riwayat-content').html('<div class="text-center"><i class="fa fa-spinner fa-spin"></i> Memuat riwayat...</div>');
+    
+    $.ajax({
+        url: '{?=url([ADMIN, "asetkami", "riwayat"])?}',
+        type: 'GET',
+        data: { kode_barang: kodeBarang },
+        success: function(response) {
+            $('#riwayat-content').html(response);
+        },
+        error: function() {
+            $('#riwayat-content').html('<div class="alert alert-danger">Gagal memuat riwayat distribusi.</div>');
+        }
+    });
+}
+</script>
+
+<style>
+.scanner-container, .result-container {
+    min-height: 400px;
+}
+
+#video {
+    max-width: 100%;
+    height: auto;
+}
+
+.well {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel-body table {
+    margin-bottom: 0;
+}
+</style>

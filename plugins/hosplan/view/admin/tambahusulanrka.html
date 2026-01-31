@@ -1,0 +1,182 @@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  :root{
+    --bg-soft:#f8fafc;
+    --border-soft:#e5e7eb;
+    --text-muted:#64748b;
+    --primary:#0ea5e9;
+    --primary-dark:#0284c7;
+  }
+  .card{border:1px solid var(--border-soft);border-radius:14px;box-shadow:0 8px 28px rgba(2,8,23,.08);overflow:hidden;background:#fff}
+  .card-header{background:linear-gradient(180deg,#f8fafc,#ffffff);border-bottom:1px solid var(--border-soft);padding:16px 18px}
+  .card-header h3{margin:0;font-weight:700;color:#0f172a}
+  .card-body{padding:18px}
+  .form-group label{font-weight:600;color:#374151;margin-bottom:6px;display:block}
+  .form-control{border:1px solid var(--border-soft);border-radius:10px;box-shadow:none;height:42px}
+  .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,165,233,.2)}
+  .select2-container{width:100% !important}
+  .select2-container .select2-selection--single{height:42px;border-radius:10px;border:1px solid var(--border-soft)}
+  .select2-container--default .select2-selection--single .select2-selection__rendered{line-height:42px;padding-left:12px}
+  .select2-container--default .select2-selection--single .select2-selection__arrow{height:40px}
+  .modal-footer{border-top:1px solid var(--border-soft);background:#fff;padding:14px}
+  .btn{border-radius:10px}
+  .btn-primary{background:var(--primary);border-color:var(--primary)}
+  .btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+  .btn-secondary{background:#6b7280;border-color:#6b7280;color:#fff}
+  .btn-secondary:hover{background:#4b5563;border-color:#4b5563;color:#fff}
+</style>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Form Usulan RKA</h3>
+  </div>
+
+  <div class="card-body">
+    <form action="{?=url([ADMIN, 'hosplan', 'saveusulanrka'])?}" method="post">
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_kode">Uraian Kegiatan</label>
+            <select id="id_kode" class="form-control select2" name="id_kode" required>
+              <option value="">Pilih Uraian Kegiatan</option>
+              {loop: $kode}
+              <option value="{$value.id_kode}">{$value.akun_belanja} - {$value.uraian_akun}</option>
+              {/loop}
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="nama_komponen">Nama Komponen</label>
+            <input id="nama_komponen" type="text" class="form-control" name="nama_komponen" placeholder="Masukkan Nama Komponen" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="spesifikasi">Spesifikasi</label>
+            <input id="spesifikasi" type="text" class="form-control" name="spesifikasi" placeholder="Masukkan Spesifikasi dengan minimal 3 Spesifikasi (contoh : Lenovo, Acer, & MacBook)" required>
+          </div>
+
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="merek">Merek</label>
+            <input type="text" class="form-control" id="merek" name="merek" placeholder="Masukkan Merek dengan minimal 3 Spesifikasi (contoh : Lenovo, Acer, & MacBook)" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="tgl_usulan">Tanggal Usulan</label>
+            <input id="tgl_usulan" type="date" class="form-control" name="tgl_usulan" required>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="id_satuan">Jenis Satuan</label>
+            <select id="id_satuan" class="form-control select2" name="id_satuan" required>
+              <option value="">Pilih Jenis Satuan</option>
+              {loop: $satuan}
+              <option value="{$value.id_satuan}">{$value.nama_satuan}</option>
+              {/loop}
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="id_unit">Unit</label>
+            <select id="id_unit" class="form-control select2" name="id_unit" required>
+              <option value="">Pilih Unit</option>
+              {loop: $unit}
+              <option value="{$value.id_unit}">{?= $value['nama_unit'] ?}</option>
+              {/loop}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="volume">Volume</label>
+            <input type="text" class="form-control" id="volume" name="volume" placeholder="Masukkan Volume" required>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="harga">Harga</label>
+            <input type="text" class="form-control" id="harga" name="harga" placeholder="Masukkan Harga" required>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="jumlah">Jumlah</label>
+            <input type="text" class="form-control" id="jumlah" name="jumlah" placeholder="Jumlah" readonly>
+          </div>
+        </div>
+
+        <div class="mb-3" style="margin-top: 12px;">
+          <label for="keterangan">Keterangan</label>
+          <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Masukkan Keterangan" required>
+        </div>
+
+        <div class="modal-footer justify-content-between">
+            <a href="{?=url([ADMIN, 'hosplan', 'usulanrka'])?}" class="btn btn-secondary">Kembali</a>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+$(function(){
+  var storageKey = 'bukbel:selectedKode';
+  var form = $("form[action*='saveusulanrka']");
+  form.on('submit', function(){
+    try { localStorage.setItem(storageKey, $('#id_kode').val() || ''); } catch(e) {}
+  });
+});
+</script>
+
+<script>
+$(document).ready(function() {
+  var userUnitId = '{?= isset_or($userUnitId) ?}';
+  $('.select2').select2({
+    placeholder: "Pilih & Ketik minimal 3 huruf untuk mencari...",
+    width: '100%',
+    language: {
+      inputTooShort: function() {
+        return "Ketik minimal 3 huruf untuk mencari";
+      },
+      noResults: function() {
+        return "Tidak ada hasil ditemukan";
+      }
+    }
+  });
+  if (userUnitId && String(userUnitId).length) {
+    $('#id_unit').val(String(userUnitId)).trigger('change');
+  }
+
+  function onlyDigits(str){ return String(str || '').replace(/\D+/g,''); }
+  function toInt(str){ var s = onlyDigits(str); var n = parseInt(s,10); return isNaN(n) ? 0 : n; }
+  function formatId(n){ return (n||0).toLocaleString('id-ID'); }
+
+  $('#volume').on('input', function(){
+    var n = toInt(this.value);
+    this.value = formatId(n);
+    var harga = parseFloat($('#harga').val()) || 0;
+    $('#jumlah').val(formatId(n * harga));
+  });
+  $('#harga').on('input', function(){
+    var n = toInt(this.value);
+    this.value = formatId(n);
+    var volume = toInt($('#volume').val());
+    $('#jumlah').val(formatId(volume * n));
+  });
+
+  $('form').on('submit', function(){
+    var v = toInt($('#volume').val());
+    $('#volume').val(v);
+    var h = toInt($('#harga').val());
+    $('#harga').val(h);
+    var j = toInt($('#jumlah').val());
+    $('#jumlah').val(j);
+  });
+});
+</script>

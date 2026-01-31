@@ -1,0 +1,83 @@
+<style>
+    .btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#ff4d4f 0%,#d9363e 100%);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    text-decoration:none;
+    transition:all 0.3s ease;
+  }
+  .btn-back:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.15);
+    filter:brightness(1.05);
+    color:#fff;
+  }
+</style>
+<div class="back" style="margin-bottom: 20px; text-align: right;">
+  <a href="{?=url([ADMIN, 'asetkami', 'manage'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{$data.title}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning">
+                            <h4><i class="fa fa-archive"></i> Total Stok di Gudang: <span class="badge badge-primary">{$data.total_stok} Unit</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" id="gudangTable">
+                        <thead>
+                            <tr>
+                                <!-- <th>No</th> -->
+                                <th>Jenis Barang</th>
+                                <th>Stok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {if: $data.gudang}
+                            {loop: $data.gudang}
+                            <tr>
+                                <!-- <td>{$key+1}</td> -->
+                                <td>{$value.nm_jns_barang}</td>
+                                <td><span class="badge badge-primary">{$value.stok} Unit</span></td>
+                                <td>
+                                    <a href="{$value.detail_url}" class="btn btn-info btn-sm">
+                                        <i class="fa fa-eye"></i> Lihat Detail
+                                    </a>
+                                </td>
+                            </tr>
+                            {/loop}
+                            {else}
+                            <tr>
+                                <td colspan="3" class="text-center">Tidak ada data barang di gudang</td>
+                            </tr>
+                            {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#gudangTable').DataTable({
+        "language": {
+            "url": "{?=url('assets/jscripts/dataTables-id.json')?}"
+        }
+    });
+});
+</script>

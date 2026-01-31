@@ -1,0 +1,143 @@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  :root{
+    --bg-soft:#f8fafc;
+    --border-soft:#e5e7eb;
+    --text-muted:#64748b;
+    --primary:#0ea5e9;
+    --primary-dark:#0284c7;
+  }
+  .card{border:1px solid var(--border-soft);border-radius:14px;box-shadow:0 8px 28px rgba(2,8,23,.08);overflow:hidden;background:#fff}
+  .card-header{background:linear-gradient(180deg,#f8fafc,#ffffff);border-bottom:1px solid var(--border-soft);padding:16px 18px}
+  .card-header h3{margin:0;font-weight:700;color:#0f172a}
+  .card-body{padding:18px}
+  .form-group label{font-weight:600;color:#374151;margin-bottom:6px;display:block}
+  .form-control{border:1px solid var(--border-soft);border-radius:10px;box-shadow:none;height:42px}
+  .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,165,233,.2)}
+  .select2-container{width:100% !important}
+  .select2-container .select2-selection--single{height:42px;border-radius:10px;border:1px solid var(--border-soft)}
+  .select2-container--default .select2-selection--single .select2-selection__rendered{line-height:42px;padding-left:12px}
+  .select2-container--default .select2-selection--single .select2-selection__arrow{height:40px}
+  .modal-footer{border-top:1px solid var(--border-soft);background:#fff;padding:14px}
+  .btn{border-radius:10px}
+  .btn-primary{background:var(--primary);border-color:var(--primary)}
+  .btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+  .btn-secondary{background:#6b7280;border-color:#6b7280;color:#fff}
+  .btn-secondary:hover{background:#4b5563;border-color:#4b5563;color:#fff}
+</style>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Form Usulan RBA</h3>
+  </div>
+
+  <div class="card-body">
+    <form action="{?=url([ADMIN, 'hosplan', 'saveusulanrba'])?}" method="post">
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_rba">Uraian Kegiatan (Nama Akun Belanja)</label>
+            <select id="id_rba" class="form-control select2" name="id_rba" required>
+              <option value="">Pilih Uraian Kegiatan</option>
+              {loop: $rba}
+              <option value="{$value.id_rba}">{$value.uraian_kegiatan}</option>
+              {/loop}
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="pergeseran">Anggaran Pergesran</label>
+            <select id="pergeseran" class="form-control select2" name="pergeseran" required>
+              <option value="">Pilih Anggaran Pergesran</option>
+              {loop: $rba}
+              <option value="{$value.pergeseran}">{$value.uraian_kegiatan} &nbsp; - &nbsp; {?=number_format($value['pergeseran'], 0, ',', '.')?}</option>
+              {/loop}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="permintaan_anggaran">Permintaan Anggaran</label>
+            <input type="text" class="form-control" id="permintaan_anggaran" name="permintaan_anggaran" placeholder="Masukkan Permintaan" required>
+          </div>
+
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="total">Total</label>
+            <input type="text" class="form-control" id="total" name="total" placeholder="Total" readonly>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12 mb-3" style="margin-top: 12px;">
+            <label for="id_pptk">PPTK</label>
+            <select id="id_pptk" class="form-control select2" name="id_pptk" required>
+              <option value="">Pilih PPTK</option>
+              {loop: $pptk}
+              <option value="{$value.id_pptk}">{$value.nama_pptk}</option>
+              {/loop}
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer justify-content-between">
+            <a href="{?=url([ADMIN, 'hosplan', 'usulanrba'])?}" class="btn btn-secondary">Kembali</a>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+$(function(){
+  var storageKey = 'rba:selectedRba';
+  var form = $("form[action*='saveusulanrba']");
+  form.on('submit', function(){
+    try { localStorage.setItem(storageKey, $('#id_rba').val() || ''); } catch(e) {}
+  });
+});
+</script>
+
+<script>
+$(document).ready(function() {
+  $('.select2').select2({
+    placeholder: "Pilih & Ketik minimal 3 huruf untuk mencari...",
+    width: '100%',
+    language: {
+      inputTooShort: function() {
+        return "Ketik minimal 3 huruf untuk mencari";
+      },
+      noResults: function() {
+        return "Tidak ada hasil ditemukan";
+      }
+    }
+  });
+
+  function onlyDigits(str){ return String(str || '').replace(/\D+/g,''); }
+  function toInt(str){ var s = onlyDigits(str); var n = parseInt(s,10); return isNaN(n) ? 0 : n; }
+  function formatId(n){ return (n||0).toLocaleString('id-ID'); }
+
+  $('#permintaan_anggaran').on('input', function(){
+    var v = toInt(this.value);
+    this.value = formatId(v);
+    var pergeseran = parseInt($('#pergeseran').val(), 10) || 0;
+    $('#total').val(formatId(v + pergeseran));
+  });
+  $('#pergeseran').on('change input', function(){
+    var v = toInt($('#permintaan_anggaran').val());
+    var pergeseran = parseInt($(this).val(), 10) || 0;
+    $('#total').val(formatId(v + pergeseran));
+  });
+
+  $('form').on('submit', function(){
+    var pa = toInt($('#permintaan_anggaran').val());
+    $('#permintaan_anggaran').val(pa);
+    var t = toInt($('#total').val());
+    $('#total').val(t);
+  });
+});
+</script>

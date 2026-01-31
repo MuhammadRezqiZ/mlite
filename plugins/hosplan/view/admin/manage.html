@@ -1,0 +1,303 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<!-- DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+<style media="screen">
+  .modern-stat-card {
+    border-radius: 12px;
+    padding: 15px;
+    color:white;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .modern-stat-card.rka {
+    background: linear-gradient(135deg, #4CAF50 0%, #338937 100%);
+  }
+  
+  .modern-stat-card.rba {
+    background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%);
+  }
+  
+  .modern-stat-card.surat {
+    background: linear-gradient(135deg, #FFC107 0%, #F57C00 100%);
+  }
+
+  .modern-stat-card.upload {
+    background: linear-gradient(135deg, #ff4242 0%, #b81212 100%);
+  }
+  
+  .modern-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+  }
+  
+  .modern-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .notif-badge{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    background:#ff3b30;
+    color:#fff;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    min-width:22px;
+    height:22px;
+    line-height:22px;
+    padding:0 6px;
+    border:2px solid #fff;
+    box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    z-index:10;
+  }
+</style>
+
+<div class="row" style="margin-bottom: 40px;">
+    <!-- Total Kas -->
+    <div class="col-lg-3 col-md-6">
+        <div class="modern-stat-card rka">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-clipboard fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
+                        <div class="huge" id="total-kas">{?=$jumlah_usulanrka?}</div>
+                        <div>Jumlah Usulan RKA</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total Usulan RKA terkini</span>
+                <span class="pull-right"><i class="fa fa-clipboard"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kas Masuk -->
+    <div class="col-lg-3 col-md-6">
+        <div class="modern-stat-card rba">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-clipboard fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
+                        <div class="huge" id="kas-masuk">{?=$jumlah_usulanrba?}</div>
+                        <div>Jumlah Usulan RBA</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total Usulan RBA terkini</span>
+                <span class="pull-right"><i class="fa fa-clipboard"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kas Keluar -->
+    <div class="col-lg-3 col-md-6">
+        <div class="modern-stat-card surat">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-envelope fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
+                        <div class="huge" id="kas-keluar">{?=$jumlah_suratusulan?}</div>
+                        <div>Jumlah Surat Usulan</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total Surat Usulan terkini</span>
+                <span class="pull-right"><i class="fa fa-envelope"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Jurnal Entries -->
+    <div class="col-lg-3 col-md-6">
+        <div class="modern-stat-card upload">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-book fa-5x"></i>
+                    </div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
+                        <div class="huge" id="jurnal-entries">{?=$jumlah_usulanbukbel?}</div>
+                        <div>Jumlah Usulan Bukbel</div>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <span class="pull-left">Total Usulan Bukbel terkini</span>
+                <span class="pull-right"><i class="fa fa-upload"></i></span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <ul class="modules" style="padding:0;margin:0;">
+            {loop: $sub_modules}
+            <li class="module" style="margin-bottom: 20px;">
+                <div class="panel panel-default">
+                    <a href="{$value.url}" class="panel-body text-center" style="position:relative">
+                        {if: $value.name == 'Konfirmasi Usulan' && isset($totalPending) && $totalPending > 0}
+                        <span class="notif-badge">{?=$totalPending?}</span>
+                        {/if}
+                        <div class="panel-thumb">
+                            <i class="fa fa-{$value.icon}"></i>
+                            <div class="desc">
+                                {$value.desc}
+                            </div>
+                        </div>
+                        <h4><b>{$value.name}</b></h4>
+                    </a>
+                </div>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+</div>
+
+<div class="row" style="margin-bottom: 20px;">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-clock-o"></i> Data RBA RSUD H. Damanhuri Barabai
+                
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="tabelRBA" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Kode Akun</th>
+                                <th>Uraian Kegiatan</th>
+                                <th>Anggaran Murni</th>
+                                <th>Perubahan</th>
+                                <th>Pergeseran</th>
+                                <th>Realisasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loop: $tabel_rba}
+                            <tr>
+                                <td>{$value.kode_akun}</td>
+                                <td>{$value.uraian_kegiatan}</td>
+                                <td>{?=number_format($value['anggaran'], 0, ',', '.')?}</td>
+                                <td>{?=number_format($value['perubahan'], 0, ',', '.')?}</td>
+                                <td>{?=number_format($value['pergeseran'], 0, ',', '.')?}</td>
+                                <td>{?=number_format($value['realisasi'], 0, ',', '.')?}</td>
+                            </tr>
+                            {/loop}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-bottom: 20px;">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-clock-o"></i> Data Akun Belanja RSUD H. Damanhuri Barabai
+                
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="tabelAkunBelanja" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Kode Kategori Baru</th>
+                                <th>Uraian Kategori</th>
+                                <th>Akun Belanja</th>
+                                <th>Uraian Akun</th>
+                                <th>Kelompok</th>
+                                <th>Kode Kelompok</th>
+                                <th>len</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loop: $tabel_akunbelanja}
+                            <tr>
+                                <td>{$value.kode_kategori_baru}</td>
+                                <td>{$value.uraian_kategori}</td>
+                                <td>{$value.akun_belanja}</td>
+                                <td>{$value.uraian_akun}</td>
+                                <td>{$value.kelompok}</td>
+                                <td>{$value.kode_kelompok}</td>
+                                <td>{$value.len}</td>
+                            </tr>
+                            {/loop}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+  $('#tabelRBA').DataTable({
+    "pageLength": 10, // default show 10 entries
+    "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+    "language": {
+      "lengthMenu": "Tampilkan _MENU_ data per halaman",
+      "zeroRecords": "Data tidak ditemukan",
+      "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+      "infoEmpty": "Tidak ada data tersedia",
+      "infoFiltered": "(disaring dari total _MAX_ data)",
+      "search": "Cari:",
+      "paginate": {
+        "first": "Pertama",
+        "last": "Terakhir",
+        "next": "›",
+        "previous": "‹"
+      }
+    }
+  });
+  $('#tabelAkunBelanja').DataTable({
+    "pageLength": 10, // default show 10 entries
+    "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+    "language": {
+      "lengthMenu": "Tampilkan _MENU_ data per halaman",
+      "zeroRecords": "Data tidak ditemukan",
+      "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+      "infoEmpty": "Tidak ada data tersedia",
+      "infoFiltered": "(disaring dari total _MAX_ data)",
+      "search": "Cari:",
+      "paginate": {
+        "first": "Pertama",
+        "last": "Terakhir",
+        "next": "›",
+        "previous": "‹"
+      }
+    }
+  });
+});
+
+</script>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <style>
+  /* Style dasar area cetak */
+  .print-area {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+    font-size: 12pt;
+    color: #111827;
+  }
+  .print-container { max-width: 1800px; margin: 0 auto; padding: 8px 16px; }
+  .page-title { text-align: center; font-size: 24px; font-weight: 700; margin: 28px 0 18px; color: #0f172a; }
+  .subtitle { font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #374151; }
+  .btn-tombol { justify-content: center; border: 0; border-radius: 8px; padding: 10px 14px; font-size: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .btn-tombol:hover { background: #1f2937; }
+  /* Penyesuaian ukuran tombol-tombol agar seragam dengan tombol kecil */
+  .card.card-default .card-footer .btn-tombol { padding: 8px 12px; }
+  .print-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06); padding: 20px; overflow: hidden; }
+  .print-card > * { margin-top: 0; }
+  /* Modernisasi kartu form dan kontrol */
+  .card.card-default.no-print { border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+  .card.card-default .card-header { background: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 12px 16px; }
+  .card.card-default .card-title { font-weight: 600; color: #0f172a; margin: 0; }
+  .card.card-default .card-body { padding: 16px; }
+  .card.card-default .card-footer { background: transparent; border-top: 0; padding: 12px 16px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .card.card-default .form-group label { font-weight: 600; color: #374151; margin-bottom: 6px; }
+  .card.card-default .form-control { border-radius: 10px; border: 1px solid #d1d5db; padding: 8px 12px; transition: border-color .15s ease, box-shadow .15s ease; }
+  .card.card-default .form-control:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); outline: none; }
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}
+  .form-grid .span-2{grid-column:1/-1}
+  .card.card-default .form-group{margin-bottom:8px}
+  .callout.callout-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #0f172a; border-radius: 10px; padding: 12px 14px; }
+  .btn-primary.btn-sm { border-radius: 8px; }
+  .rka-table { width: 100%; border-collapse: collapse; border-spacing: 0; }
+  /* Tambahkan garis tepi (border) untuk seluruh sel tabel saat cetak */
+  .rka-table th, .rka-table td { border: 1px solid #000; padding: 6px 10px !important; vertical-align: top; }
+  .rka-table thead th { background: #f3f4f6; color: #111827; font-weight: 600; text-align: center; }
+  /* Rapikan baris total dan angka rupiah saat pratinjau */
+  .rka-table .total-row td { background: #f8fafc; border-top: 2px solid #000; font-weight: 600; }
+  .text-jumlah, #sum-total { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  /* Lebar kolom agar rapi saat pratinjau */
+  .rka-table th.text-uraian, .rka-table td.text-uraian { width: 20%; }
+  .rka-table th.text-volume, .rka-table td.text-nama { width: 12%; }
+  .rka-table th.text-satuan, .rka-table td.text-spesifikasi { width: 12%; }
+  .rka-table th.text-harga, .rka-table td.text-merek { width: 12%; }
+  .rka-table th.text-jumlah, .rka-table td.text-jumlah { width: 12%; }
+  .rka-table th.text-unit, .rka-table td.text-unit { width: 6%; }
+  .rka-table th.text-keterangan, .rka-table td.text-keterangan { width: 26%; }
+  /* Ratakan label metadata di header */
+  .subtitle strong { display: inline-block; min-width: 140px; }
+
+  .rka-table tbody tr:nth-child(odd) { background: #fafafa; }
+  .text-right { text-align: right; }
+  .text-center { text-align: center; }
+  /* Penomoran otomatis kolom No */
+  .rka-table tbody { counter-reset: rownum; }
+  .rka-table td.row-number::before { counter-increment: rownum; content: counter(rownum); }
+  @media print {
+    /* Kertas A4 portrait dengan margin nyaman */
+    @page { size: A4 landscape; margin-left: 10mm; margin-right: 10mm; margin-bottom: 10mm; margin-top: 0mm; }
+
+    /* Hilangkan margin/padding default di html & body agar kop naik */
+    html, body { margin: 0 !important; padding: 0 !important; }
+
+    /* Sembunyikan elemen non-print (navbar, footer, dll) */
+    .no-print,
+    .sidebar,
+    .navbar,
+    #navbar-wrapper,
+    nav.navbar,
+    .footer,
+    .main-header,
+    .main-sidebar,
+    .control-sidebar,
+    .brand-link,
+    .content-header,
+    .content-title,
+    .icon-bar,
+    #notify,
+    .dropdown-menu,
+    .main-footer,
+    footer { display: none !important; }
+
+    /* Biarkan area surat tampil normal dan gunakan font serif untuk cetak */
+    .print-area { position: static; width: 100%; font-family: 'Times New Roman', Times, serif; color: #000; margin-top: 0 !important; }
+    .print-container { max-width: none !important; padding: 0 !important; }
+    /* Hapus ruang atas dari wrapper bootstrap agar judul naik */
+    .content-wrapper, .container-fluid, .content, .row, .col-12 { margin-top: 0 !important; padding-top: 0 !important; }
+    .print-card { box-shadow: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; }
+
+    /* Tabel cetak klasik: garis tebal hitam, tanpa zebra */
+    .text-uraian { font-size: 14px; font-weight: 300; color: #000; }
+    .text-nama { font-size: 14px; font-weight: 300; color: #000; }
+    .text-spesifikasi { font-size: 14px; font-weight: 300; color: #000; }
+    .text-merek { font-size: 14px; font-weight: 160; color: #000; }
+    .text-volume { font-size: 14px; font-weight: 160; color: #000; }
+    .text-satuan { font-size: 14px; font-weight: 160; color: #000; }
+    .text-harga { font-size: 14px; font-weight: 240; color: #000; }
+    .text-jumlah { font-size: 14px; font-weight: 300; color: #000; }
+    .text-unit { font-size: 14px; font-weight: 240; color: #000; }
+    .text-keterangan { font-size: 14px; font-weight: 300; color: #000; }
+    table.rka-table { width: 100% !important; border-collapse: collapse !important; border: 1px solid #000 !important; }
+    .rka-table thead th { background: #fff !important; color: #000 !important; text-align: center !important; border: 1px solid #000 !important; }
+    .rka-table tbody td { background: #fff !important; color: #000 !important; border: 1px solid #000 !important; }
+    .rka-table tbody tr:nth-child(odd) { background: #fff !important; }
+    /* Beri jarak antara isi dan garis saat cetak */
+    .rka-table th, .rka-table td { padding: 8px 12px !important; }
+    /* Cetak: tebalkan garis pemisah pada baris total dan cegah angka terpotong */
+    .rka-table .total-row td { border-top: 1px solid #000 !important; font-size: 14px; font-weight: 700 !important; background: #fff !important; }
+    #sum-total { white-space: nowrap !important; }
+
+    /* Judul lebih besar saat cetak */
+    .page-title { font-size: 20px !important; color: #000 !important; margin: 0 0 0mm !important; }
+
+    /* Sembunyikan tombol aksi saat cetak */
+    .btn-print { display: none !important; }
+    .subtitle { color: #000 !important; }
+
+    /* Matikan penambahan URL otomatis di belakang tautan saat print */
+    a[href]:after, abbr[title]:after { content: '' !important; }
+  }
+  .custom-modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.4); }
+  .custom-modal-content { background:#fff; margin:10% auto; padding:20px; border:1px solid #888; width:80%; max-width:600px; border-radius:8px; text-align:center; }
+  .close-modal { float:right; font-size:28px; font-weight:bold; cursor:pointer; color:#999; }
+  .close-modal:hover { color:#000; }
+  .ttd-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; margin-top:20px; }
+  .ttd-item { border:1px solid #ddd; padding:10px; border-radius:4px; cursor:pointer; transition:transform .2s, border-color .2s; }
+  .ttd-item:hover { transform:scale(1.05); border-color:#007bff; }
+  .ttd-item img { max-width:150px; max-height:100px; display:block; margin:0 auto; }
+  .signature #ttd-image-container { min-height:110px; display:flex; align-items:center; justify-content:center; }
+  .signature #ttd-image-container img.ttd-img { max-height:110px; width:auto; image-rendering:-webkit-optimize-contrast; }
+  @media print { .signature #ttd-image-container img.ttd-img { max-height:110px; } }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
+<div class="wrapper">
+  <div class="content-wrapper">
+    <section class="content" >
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 print-container">
+            <div class="callout callout-info no-print" style="margin-bottom: 20px;">
+              <h5><i class="fa fa-info"></i> &nbsp; Catatan :</h5>
+               Pastikan anda telah menginput semua inputan Surat Usulan RKA terlebih dulu sebelum menekan tombol 🖨️ Print/Simpan pdf.
+            </div>
+            <div class="card card-default no-print" style="margin-bottom: 20px;">
+              <div class="card-header">
+                <h3 class="card-title">Input Surat Usulan RKA</h3>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="nomor_surat">Sumber Dana :</label>
+                      <input type="text" id="nomor_surat" class="form-control" placeholder="Contoh : BLUD" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="tanggal_cetak">Tanggal :</label>
+                      <input type="date" id="tanggal_cetak" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form_group">
+                      <label for="tahun_cetak">Tahun :</label>
+                      <select class="form-control" id="tahun_cetak" name="tahun_cetak" required>
+                        <option value="">Pilih Tahun</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="rba_cetak">Kode Kegiatan :</label>
+                      <select id="rba_cetak" value="" class="form-control select2">
+                        <option value="">Pilih Kode Kegiatan</option>
+                        {loop: $rba}
+                          <option value="{$value.id_rba}" 
+                                  data-kode="{$value.kode_akun}"
+                                  data-uraian="{$value.uraian_kegiatan}"
+                                  >{$value.kode_akun} - {$value.uraian_kegiatan}
+                          </option>
+                        {/loop}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="pptk_cetak">Dari PPTK :</label>
+                      <select id="pptk_cetak" value="" class="form-control select2">
+                        <option value="">Pilih PPTK</option>
+                        {loop: $pptk}
+                          <option value="{$value.id_pptk}" 
+                                  data-nama="{$value.nama_pptk}"
+                                  data-nip="{$value.nip}"
+                                  >{$value.nama_pptk}
+                          </option>
+                        {/loop}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6" hidden>
+                    <div class="form-group">
+                      <label for="nip_pptk">NIP :</label>
+                      <input type="text" id="nip_pptk" class="form-control" readonly>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button id="btnTerapkanCetak" class="btn-tombol btn-info btn-sm" style="background:#0743c5;color:#fff;">Terapkan</button>
+                <button id="btn-sign" class="btn-tombol btn-print no-print" style="background:#28a745;color:#fff;">✍️ TTD-Elektronik</button>
+                <button class="btn-tombol btn-print no-print" onclick="window.print()" style="background:#111827;color:#fff;">🖨️ Print / Simpan PDF</button>
+                <button class="btn-tombol no-print" onclick="window.excel()" style="background:#0c7511;color:#fff;">📝 Excel</button>
+                <a href="{?=url([ADMIN, 'hosplan', 'usulanbukbel'])?}" class="btn-tombol btn-secondary no-print" style="background:#dc0404;color:#fff;">Kembali</a>
+              </div>
+            </div>
+            <!-- Main content -->
+            <div class="print-area">
+              <!-- title row -->
+              <div class="row">
+                <div class="col-12">
+                  <h1 class="page-title"><strong>RSUD H. DAMANHURI BARABAI</strong><BR>BUKU PEMBANTU BELANJA</BR></h1>
+                  <style>
+                    .meta-grid { display: grid; grid-template-columns: 160px 12px 1fr; column-gap: 6px; row-gap: 4px; margin-bottom: 10px; align-items: start; }
+                    .meta-label { color: #000; }
+                    .meta-sep { color: #000; text-align: center; }
+                    .meta-value { color: #000; }
+                    .meta-grid div { line-height: 1.25; }
+                    .meta-divider { grid-column: 1 / -1; height: 2px; background: #000; margin: 6px 0; }
+                    .print-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; background: #fff; }
+                    .rka-table { width: 100%; border-collapse: collapse; }
+                    .rka-table thead th { background: #f5f7fa !important; color: #000 !important; }
+                    .rka-table tbody tr:nth-child(odd) { background: #fff !important; }
+                    .rka-table td.text-anggaran, .rka-table td.permintaan, .rka-table td.text-total { text-align: right !important; }
+                    .rka-table tbody tr.total-row td { font-weight: 700; background: #f9fafb; }
+                  </style>
+                  <div class="meta-grid subtitle" style="margin-bottom: 12px;">
+                    <div class="meta-label">Sumber Dana</div><div class="meta-sep">:</div><div class="meta-value"><span id="dana_area"> - </span></div>
+                    <div class="meta-label">Tahun</div><div class="meta-sep">:</div><div class="meta-value"><span id="tahun_area"> - </span></div>
+                    <div class="meta-label">Kode Kegiatan</div><div class="meta-sep">:</div><div class="meta-value"><span id="kode_kegiatan_area">-</span></div>
+                    <div class="meta-label">Uraian Kegiatan</div><div class="meta-sep">:</div><div class="meta-value"><span id="uraian_kegiatan_area">-</span></div>
+                  </div>
+                  <div class="print-card">
+                    <table class="rka-table">
+                      <thead>
+                          <tr>
+                          <th style="text-align: center;">No</th>
+                          <th class="text-uraian" style="text-align: center;">Uraian</th>
+                          <th class="text-volume" style="text-align: center;">Tanggal Faktur</th>
+                          <th class="text-satuan" style="text-align: center;">No. Faktur</th>
+                          <th class="text-harga" style="text-align: center;">Perusahaan / Toko</th>
+                          <th class="text-jumlah" style="text-align: center;">Jumlah</th>
+                          <th class="text-unit" style="text-align: center;">SPJ</th>
+                          <th class="text-keterangan" style="text-align: center;">Keterangan</th>
+                        </tr>
+                        <tr>
+                          
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {loop: $usulanbukbel}
+                        <tr>
+                          <td class="row-number text-center"></td>
+                          <td class="text-uraian" style="text-align: left;">{$value.uraian}</td>
+                          <td class="text-nama" style="text-align: center;">{$value.tgl_faktor}</td>
+                          <td class="text-spesifikasi" style="text-align: center;">{$value.no_faktor}</td>
+                          <td class="text-merek" style="text-align: center;">{$value.toko}</td>
+                          <td class="text-jumlah text-right">Rp. {?=number_format($value['jumlah'], 0, ',', '.')?}</td>
+                          <td class="text-unit" style="text-align: center;">{$value.status_spj}</td>
+                          <td class="text-keterangan" style="text-align: center;">{$value.keterangan}</td>
+                        </tr>
+                        {/loop}
+                        <tr class="total-row">
+                          <td colspan="5" style="text-align: right; padding-right: 12px;">Total</td>
+                          <td id="sum-total" class="text-right">Rp. -</td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                    <div class="signature" style="width: 320px; float: right; margin-top: 50px; text-align: center; font-size: 14px;">
+                      <div>Barabai, <span id="tanggal_area"></span></div>
+                      <div class="">Pejabat Pelaksana Teknis Kegiatan</div>
+                      
+
+                      <!-- Ruang tanda tangan -->
+                      <div id="ttd-image-container" style="margin-top:6px;"></div>
+
+                      <div class="name" style="margin-top: 1px; font-weight: 700;"><span id="pptk_area" style="text-decoration: underline;">-</span></div>
+                      <div style="font-size: 14px"><span id="nip_area">-</span></div>
+                    </div>
+                </div>
+                <!-- /.col -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+<!-- Modal Pilihan TTD -->
+<div id="ttdModal" class="custom-modal">
+  <div class="custom-modal-content">
+    <span class="close-modal">&times;</span>
+    <h3>Pilih Tanda Tangan</h3>
+    <div class="ttd-grid">
+      {loop: $ttd_files}
+        <div class="ttd-item" data-src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}">
+          <img src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}" alt="{$value}">
+          <p style="margin-top:5px;font-size:12px;">{$value}</p>
+        </div>
+      {/loop}
+    </div>
+  </div>
+</div>
+<script>
+  if (window.jQuery && typeof $.fn.select2 === 'function') {
+    $('.select2').select2({
+      placeholder: "Ketik minimal 3 huruf untuk mencari...",
+      width: '100%',
+      language: {
+        inputTooShort: function() {
+          return "Ketik minimal 3 huruf untuk mencari";
+        },
+        noResults: function() {
+          return "Tidak ada hasil ditemukan";
+        }
+      }
+    });
+  }
+  const checkAllEl = document.getElementById('checkAll');
+  if (checkAllEl) {
+    checkAllEl.addEventListener('change', function() {
+      document.querySelectorAll('input[name="id_usulan[]"]').forEach(cb => cb.checked = this.checked);
+    });
+  }
+  // Hitung total kolom "Jumlah" dan tampilkan di baris Total
+  function updateTableTotals() {
+    let sumTotal = 0;
+    document.querySelectorAll('.rka-table tbody tr:not(.total-row) td.text-jumlah').forEach(function(td){
+      const raw = td.textContent || '';
+      const numeric = parseInt(String(raw).replace(/[^0-9]/g, ''), 10);
+      if (!isNaN(numeric)) sumTotal += numeric;
+    });
+    const totalSumEl = document.getElementById('sum-total');
+    if (totalSumEl) totalSumEl.textContent = 'Rp. ' + sumTotal.toLocaleString('id-ID');
+  }
+
+  document.addEventListener('DOMContentLoaded', updateTableTotals);
+  document.getElementById('btnTerapkanCetak').addEventListener('click', function(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    const tanggalInput = (document.getElementById('tanggal_cetak') && document.getElementById('tanggal_cetak').value) || '';
+    // Data header
+    const sumberDana = ((document.getElementById('nomor_surat') && document.getElementById('nomor_surat').value) || '').trim();
+    const tahunVal = ((document.getElementById('tahun_cetak') && document.getElementById('tahun_cetak').value) || '').trim();
+    // Pilihan PPTK
+    const pptkSelect = document.getElementById('pptk_cetak');
+    // Ambil nilai yang diketik manual jika ada (aman terhadap elemen null)
+    const namaEl = document.getElementById('nama_pegawai');
+    const nipEl = document.getElementById('nip_pptk');
+    const namaPegawaiInput = ((namaEl && namaEl.value) || '').trim();
+    const nipPegawaiInput = ((nipEl && nipEl.value) || '').trim();
+    // Fallback ke data atribut dari option bila input kosong
+    const namaPegawaiOption = pptkSelect && pptkSelect.selectedIndex >= 0
+      ? (pptkSelect.options[pptkSelect.selectedIndex].getAttribute('data-nama') || '')
+      : '';
+    const nipPegawaiOption = pptkSelect && pptkSelect.selectedIndex >= 0
+      ? (pptkSelect.options[pptkSelect.selectedIndex].getAttribute('data-nip') || '')
+      : '';
+
+    const namaFinal = namaPegawaiInput || namaPegawaiOption;
+    const nipFinal = nipPegawaiInput || nipPegawaiOption;
+
+    if (tanggalInput) {
+      const tanggalBaru = new Date(tanggalInput);
+      const options = { day: 'numeric', month: 'long', year: 'numeric' };
+      let formatTanggal = tanggalBaru.toLocaleDateString('id-ID', options);
+      formatTanggal = formatTanggal.replace(/(\s[a-z])/, function(m) { return m.toUpperCase(); });
+
+      // Tampilkan tanggal saja pada span; teks "Barabai," sudah ada di markup
+      var tEl = document.getElementById('tanggal_area');
+      if (tEl) tEl.innerText = formatTanggal;
+    }
+    // Update header: Sumber Dana & Tahun
+    var danaEl = document.getElementById('dana_area');
+    if (danaEl) danaEl.innerText = sumberDana || '-';
+    var tahunEl = document.getElementById('tahun_area');
+    if (tahunEl) tahunEl.innerText = tahunVal || '-';
+    var pptkEl = document.getElementById('pptk_area');
+    if (pptkEl) pptkEl.innerText = namaFinal || '-';
+    var nipAreaEl = document.getElementById('nip_area');
+    if (nipAreaEl) nipAreaEl.innerText = nipFinal ? `NIP. ${nipFinal}` : '-';
+    // Update kode & uraian kegiatan dari RBA
+    const rbaSelect = document.getElementById('rba_cetak');
+    const rbaOpt = rbaSelect && rbaSelect.selectedIndex >= 0 ? rbaSelect.options[rbaSelect.selectedIndex] : null;
+    const kodeKegiatan = rbaOpt ? (rbaOpt.getAttribute('data-kode') || '') : '';
+    const uraianKegiatan = rbaOpt ? (rbaOpt.getAttribute('data-uraian') || '') : '';
+    var kodeEl = document.getElementById('kode_kegiatan_area');
+    if (kodeEl) kodeEl.innerText = kodeKegiatan || '-';
+    var uraianEl = document.getElementById('uraian_kegiatan_area');
+    if (uraianEl) uraianEl.innerText = uraianKegiatan || '-';
+  });
+
+  // Autofill nama dan NIP saat PPTK dipilih
+  const pptkCetakEl = document.getElementById('pptk_cetak');
+  if (pptkCetakEl) {
+    function fillFromSelectedPptkOption(sel) {
+      if (!sel) return;
+      const namaPegawai = sel.getAttribute('data-nama') || '';
+      const nipPegawai = sel.getAttribute('data-nip') || '';
+      var namaEl = document.getElementById('nama_pegawai');
+      var nipEl = document.getElementById('nip_pptk');
+      if (namaEl) namaEl.value = namaPegawai;
+      if (nipEl) nipEl.value = nipPegawai;
+      // Sekaligus update area tanda tangan agar sinkron
+      var pptkEl = document.getElementById('pptk_area');
+      if (pptkEl) pptkEl.innerText = namaPegawai || '-';
+      var nipAreaEl = document.getElementById('nip_area');
+      if (nipAreaEl) nipAreaEl.innerText = nipPegawai ? `NIP. ${nipPegawai}` : '-';
+    }
+
+    pptkCetakEl.addEventListener('change', function() {
+      const selected = this.options[this.selectedIndex];
+      fillFromSelectedPptkOption(selected);
+    });
+
+    // Jika Select2 aktif, pastikan event spesifiknya juga memicu autofill
+    if (window.jQuery && typeof $.fn.select2 === 'function') {
+      $('#pptk_cetak').on('select2:select', function(e) {
+        const idx = pptkCetakEl.selectedIndex;
+        const selected = pptkCetakEl.options[idx];
+        fillFromSelectedPptkOption(selected);
+      });
+      $('#pptk_cetak').on('select2:clear', function() {
+        var namaEl = document.getElementById('nama_pegawai');
+        var nipEl = document.getElementById('nip_pptk');
+        if (namaEl) namaEl.value = '';
+        if (nipEl) nipEl.value = '';
+        var pptkEl = document.getElementById('pptk_area');
+        if (pptkEl) pptkEl.innerText = '-';
+        var nipAreaEl = document.getElementById('nip_area');
+        if (nipAreaEl) nipAreaEl.innerText = '-';
+      });
+    }
+
+  // Sinkronkan Kode & Uraian Kegiatan saat RBA dipilih
+  const rbaEl = document.getElementById('rba_cetak');
+  if (rbaEl) {
+    function fillFromRbaOption(sel) {
+      if (!sel) return;
+      const kodeKegiatan = sel.getAttribute('data-kode') || '';
+      const uraianKegiatan = sel.getAttribute('data-uraian') || '';
+      var kodeEl = document.getElementById('kode_kegiatan_area');
+      if (kodeEl) kodeEl.innerText = kodeKegiatan || '-';
+      var uraianEl = document.getElementById('uraian_kegiatan_area');
+      if (uraianEl) uraianEl.innerText = uraianKegiatan || '-';
+    }
+    rbaEl.addEventListener('change', function() {
+      const selected = this.options[this.selectedIndex];
+      fillFromRbaOption(selected);
+    });
+    if (window.jQuery && typeof $.fn.select2 === 'function') {
+      $('#rba_cetak').on('select2:select', function() {
+        const idx = rbaEl.selectedIndex;
+        const selected = rbaEl.options[idx];
+        fillFromRbaOption(selected);
+      });
+      $('#rba_cetak').on('select2:clear', function() {
+        var kodeEl = document.getElementById('kode_kegiatan_area');
+        if (kodeEl) kodeEl.innerText = '-';
+        var uraianEl = document.getElementById('uraian_kegiatan_area');
+        if (uraianEl) uraianEl.innerText = '-';
+      });
+    }
+  }
+  }
+
+  window.excel = function(){
+    try {
+      var table = document.querySelector('.rka-table');
+      if (!table) { alert('Tabel bukbel tidak ditemukan'); return; }
+      function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      var dana = (document.getElementById('dana_area') && document.getElementById('dana_area').innerText) || '-';
+      var tahun = (document.getElementById('tahun_area') && document.getElementById('tahun_area').innerText) || '-';
+      var kode = (document.getElementById('kode_kegiatan_area') && document.getElementById('kode_kegiatan_area').innerText) || '-';
+      var uraian = (document.getElementById('uraian_kegiatan_area') && document.getElementById('uraian_kegiatan_area').innerText) || '-';
+      var tanggalTtd = (document.getElementById('tanggal_area') && document.getElementById('tanggal_area').innerText) || '';
+
+      var rows = [];
+      var sumTotal = 0;
+      table.querySelectorAll('tbody tr:not(.total-row)').forEach(function(tr){
+        var tds = tr.querySelectorAll('td');
+        var r = [];
+        for (var i=0;i<tds.length;i++){ r.push((tds[i].textContent||'').trim()); }
+        rows.push(r);
+        var raw = r[5] || '';
+        var numeric = parseInt(String(raw).replace(/[^0-9]/g,''),10);
+        if (!isNaN(numeric)) sumTotal += numeric;
+      });
+
+      var title = '<tr><th colspan="8" style="text-align:center;font-size:16px;border:none">RSUD H. DAMANHURI BARABAI</th></tr>'+
+                  '<tr><th colspan="8" style="text-align:center;border:none">BUKU PEMBANTU BELANJA</th></tr>'+
+                  '<tr><td colspan="8" style="height:8px;border:none"></td></tr>';
+
+      var meta =
+                 '<tr><td colspan="8" style="border:none">SUMBER DANA : '+esc(dana)+'</td></tr>'+
+                 '<tr><td colspan="8" style="border:none">TAHUN : '+esc(tahun)+'</td></tr>'+
+                 '<tr><td colspan="8" style="border:none">KODE REKENING : '+esc(kode)+'</td></tr>'+
+                 '<tr><td colspan="8" style="border:none">NAMA REKENING : '+esc(uraian)+'</td></tr>'+
+                 '<tr><td colspan="8" style="height:8px;border:none"></td></tr>';
+
+      var cell = 'style="border:0.5pt solid #000;padding:3px 5px"';
+      var cellCenter = 'style="border:0.5pt solid #000;padding:3px 5px;text-align:center"';
+      var cellRight = 'style="border:0.5pt solid #000;padding:3px 5px;text-align:right"';
+
+      var thead = '<tr>'+
+                    '<th '+cellCenter+'>No</th>'+
+                    '<th '+cellCenter+'>URAIAN</th>'+
+                    '<th '+cellCenter+' colspan="4">PEMBELIAN</th>'+
+                    '<th '+cellCenter+'>SPJ</th>'+
+                    '<th '+cellCenter+'>KETERANGAN</th>'+
+                  '</tr>'+
+                  '<tr>'+
+                    '<th '+cell+'></th>'+
+                    '<th '+cell+'></th>'+
+                    '<th '+cellCenter+'>Tanggal Faktur</th>'+
+                    '<th '+cellCenter+'>No. Faktur</th>'+
+                    '<th '+cellCenter+'>Perusahaan / Toko</th>'+
+                    '<th '+cellCenter+'>Jumlah</th>'+
+                    '<th '+cellCenter+'>Sudah/Belum</th>'+
+                    '<th '+cell+'></th>'+
+                  '</tr>';
+
+      var tbody = '';
+      for (var j=0;j<rows.length;j++){
+        var r = rows[j];
+        tbody += '<tr>'+
+          '<td '+cellCenter+'>'+esc(r[0]||'')+'</td>'+
+          '<td '+cell+'>'+esc(r[1]||'')+'</td>'+
+          '<td '+cellCenter+'>'+esc(r[2]||'')+'</td>'+
+          '<td '+cellCenter+'>'+esc(r[3]||'')+'</td>'+
+          '<td '+cellCenter+'>'+esc(r[4]||'')+'</td>'+
+          '<td '+cellRight+'>'+esc(r[5]||'')+'</td>'+
+          '<td '+cellCenter+'>'+esc(r[6]||'')+'</td>'+
+          '<td '+cell+'>'+esc(r[7]||'')+'</td>'+
+        '</tr>';
+      }
+
+      var totalRow = '<tr>'+
+        '<td '+cell+'></td>'+
+        '<td '+cell+' colspan="4">TOTAL</td>'+
+        '<td '+cellRight+'>Rp. '+ sumTotal.toLocaleString('id-ID') +'</td>'+
+        '<td '+cell+'></td>'+
+        '<td '+cell+'></td>'+
+      '</tr>';
+
+      var signNama = (document.getElementById('pptk_area') && document.getElementById('pptk_area').innerText) || '';
+      var signNip = (document.getElementById('nip_area') && document.getElementById('nip_area').innerText) || '';
+
+      var footer = '<tr><td colspan="8" style="height:24px;border:none"></td></tr>'+
+                   '<tr><td colspan="8" style="text-align:right;border:none">Barabai, '+esc(tanggalTtd||'')+'</td></tr>'+
+                   '<tr><td colspan="8" style="text-align:right;border:none">Pejabat Pelaksana Teknis Kegiatan</td></tr>'+
+                   '<tr><td colspan="8" style="height:40px;border:none"></td></tr>'+
+                   '<tr><td colspan="8" style="text-align:right;border:none"><u>'+esc(signNama||'-')+'</u></td></tr>'+
+                   '<tr><td colspan="8" style="text-align:right;border:none">'+esc(signNip||'-')+'</td></tr>';
+
+      var xls = '<html><head><meta charset="UTF-8"></head><body>'+
+                '<table border="0" style="border-collapse:collapse;border:none;width:100%">'+
+                title + meta + thead + tbody + totalRow + footer +
+                '</table></body></html>';
+      var blob = new Blob([xls], {type: 'application/vnd.ms-excel'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var d = new Date();
+      a.download = 'bukbel_'+ d.getFullYear() + '-' + (('0'+(d.getMonth()+1)).slice(-2)) + '-' + (('0'+d.getDate()).slice(-2)) + '.xls';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(url); document.body.removeChild(a); }, 0);
+    } catch(err) {
+      alert('Gagal mengekspor ke Excel: ' + err);
+    }
+  };
+
+  (function(){
+    var modal = document.getElementById('ttdModal');
+    var btn = document.getElementById('btn-sign');
+    var closeBtn = modal ? modal.querySelector('.close-modal') : null;
+    if (btn && modal) { btn.addEventListener('click', function(){ modal.style.display = 'block'; }); }
+    if (closeBtn) { closeBtn.addEventListener('click', function(){ modal.style.display = 'none'; }); }
+    window.addEventListener('click', function(e){ if (e.target === modal) { modal.style.display = 'none'; } });
+    if (modal) {
+      var items = modal.querySelectorAll('.ttd-item');
+      for (var i=0;i<items.length;i++){
+        items[i].addEventListener('click', function(){
+          var src = this.getAttribute('data-src');
+          if (!src) return;
+          document.getElementById('ttd-image-container').innerHTML = '<img class="ttd-img" src="'+src+'" alt="TTD">';
+          modal.style.display = 'none';
+          if (btn) btn.style.display = 'none';
+        });
+      }
+    }
+  })();
+</script>
+</body>
+</html>

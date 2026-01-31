@@ -1,0 +1,149 @@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+  :root{--bg-soft:#f8fafc;--border-soft:#e5e7eb;--text-muted:#64748b;--primary:#0ea5e9;--primary-dark:#0284c7}
+  .card{border:1px solid var(--border-soft);border-radius:14px;box-shadow:0 8px 28px rgba(2,8,23,.08);overflow:hidden;background:#fff}
+  .card-header{background:linear-gradient(180deg,#f8fafc,#ffffff);border-bottom:1px solid var(--border-soft);padding:16px 18px}
+  .card-header h3{margin:0;font-weight:700;color:#0f172a}
+  .card-body{padding:18px}
+  .form-group label{font-weight:600;color:#374151;margin-bottom:6px;display:block}
+  .form-control{border:1px solid var(--border-soft);border-radius:10px;box-shadow:none;height:42px}
+  .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,165,233,.2)}
+  .select2-container{width:100% !important}
+  .select2-container .select2-selection--single{height:42px;border-radius:10px;border:1px solid var(--border-soft)}
+  .select2-container--default .select2-selection--single .select2-selection__rendered{line-height:42px;padding-left:12px}
+  .select2-container--default .select2-selection--single .select2-selection__arrow{height:40px}
+  .modal-footer{border-top:1px solid var(--border-soft);background:#fff;padding:14px}
+  .btn{border-radius:10px}
+  .btn-primary{background:var(--primary);border-color:var(--primary)}
+  .btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+  .btn-secondary{background:#6b7280;border-color:#6b7280;color:#fff}
+  .btn-secondary:hover{background:#4b5563;border-color:#4b5563;color:#fff}
+</style>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Form Edit Usulan RKA</h3>
+  </div>
+
+  <div class="card-body">
+    <form action="{?=url([ADMIN, 'hosplan', 'updateusulanrka'])?}" method="post">
+      <input type="hidden" id="id_usulan" name="id_usulan" value="{$usulanrka.id_usulan}">
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_kode">Uraian Kegiatan</label>
+            <select id="id_kode" class="form-control select2" name="id_kode" required>
+              <option value="">Pilih Uraian Kegiatan</option>
+              {loop: $kode}
+              <option value="{$value.id_kode}" {if: $value.id_kode == $usulanrka.id_kode}selected{/if}>{$value.akun_belanja} - {$value.uraian_akun}</option>
+              {/loop}
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="nama_komponen">Nama Komponen</label>
+            <input id="nama_komponen" type="text" class="form-control" name="nama_komponen" placeholder="Masukkan Nama Komponen" required value="{$usulanrka.nama_komponen}">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="spesifikasi">Spesifikasi</label>
+            <input id="spesifikasi" type="text" class="form-control" name="spesifikasi" placeholder="Masukkan Spesifikasi" required value="{$usulanrka.spesifikasi}">
+          </div>
+
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="merek">Merek</label>
+            <input type="text" class="form-control" id="merek" name="merek" placeholder="Merek" required value="{$usulanrka.merek}">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="tgl_usulan">Tanggal</label>
+            <input id="tgl_usulan" type="date" class="form-control" name="tgl_usulan" placeholder="Masukkan Tanggal" value="{$usulanrka.tgl_usulan}" required>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="id_satuan">Jenis Satuan</label>
+            <select id="id_satuan" class="form-control select2" name="id_satuan" required>
+              <option value="">Pilih Jenis Satuan</option>
+              {loop: $satuan}
+              <option value="{$value.id_satuan}" {if: $value.id_satuan == $usulanrka.id_satuan}selected{/if}>{$value.nama_satuan}</option>
+              {/loop}
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="id_unit">Unit</label>
+            <select id="id_unit" class="form-control select2" name="id_unit" required>
+              <option value="">Pilih Unit</option>
+              {loop: $unit}
+              <option value="{$value.id_unit}" {if: $value.id_unit == $usulanrka.id_unit}selected{/if}>{$value.nama_unit}</option>
+              {/loop}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="volume">Volume</label>
+            <input type="number" class="form-control" id="volume" name="volume" placeholder="Masukkan Volume" required value="{$usulanrka.volume}">
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="harga">Harga</label>
+            <input type="number" class="form-control" id="harga" name="harga" placeholder="Masukkan Harga" required value="{$usulanrka.harga}">
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="jumlah">Jumlah</label>
+            <input type="number" class="form-control" id="jumlah" name="jumlah" placeholder="Jumlah" readonly value="{$usulanrka.jumlah}">
+          </div>
+        </div>
+
+        <div class="mb-3" style="margin-top: 12px;">
+          <label for="keterangan">Keterangan</label>
+          <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Masukkan Keterangan" required value="{$usulanrka.keterangan}"> 
+        </div>
+
+        <div class="modal-footer justify-content-between">
+            <a href="{?=url([ADMIN, 'hosplan', 'usulanrka'])?}" class="btn btn-secondary">Kembali</a>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+
+    </form>
+  </div>
+</div>
+<script>
+$(document).ready(function() {
+  $('.select2').select2({
+    placeholder: "Ketik minimal 3 huruf untuk mencari...",
+    width: '100%',
+    language: {
+      inputTooShort: function() {
+        return "Ketik minimal 3 huruf untuk mencari";
+      },
+      noResults: function() {
+        return "Tidak ada hasil ditemukan";
+      }
+    }
+  });
+
+  var userUnitId = '{?= isset_or($userUnitId) ?}';
+  
+  if (userUnitId) {
+    $('#id_unit').val(userUnitId).trigger('change');
+  }
+
+  // Hitung otomatis jumlah
+  $('#volume, #harga').on('input', function() {
+    let volume = parseFloat($('#volume').val()) || 0;
+    let harga = parseFloat($('#harga').val()) || 0;
+    $('#jumlah').val(volume * harga);
+  });
+});
+</script>

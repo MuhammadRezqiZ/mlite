@@ -1,0 +1,183 @@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  :root{--bg-soft:#f8fafc;--border-soft:#e5e7eb;--text-muted:#64748b;--primary:#0ea5e9;--primary-dark:#0284c7}
+  .card{border:1px solid var(--border-soft);border-radius:14px;box-shadow:0 8px 28px rgba(2,8,23,.08);overflow:hidden;background:#fff}
+  .card-header{background:linear-gradient(180deg,#f8fafc,#ffffff);border-bottom:1px solid var(--border-soft);padding:16px 18px}
+  .card-header h3{margin:0;font-weight:700;color:#0f172a}
+  .card-body{padding:18px}
+  .form-group label{font-weight:600;color:#374151;margin-bottom:6px;display:block}
+  .form-control{border:1px solid var(--border-soft);border-radius:10px;box-shadow:none;height:42px}
+  .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,165,233,.2)}
+  .select2-container{width:100% !important}
+  .select2-container .select2-selection--single{height:42px;border-radius:10px;border:1px solid var(--border-soft)}
+  .select2-container--default .select2-selection--single .select2-selection__rendered{line-height:42px;padding-left:12px}
+  .select2-container--default .select2-selection--single .select2-selection__arrow{height:40px}
+  .modal-footer{border-top:1px solid var(--border-soft);background:#fff;padding:14px}
+  .btn{border-radius:10px}
+  .btn-primary{background:var(--primary);border-color:var(--primary)}
+  .btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+  .btn-secondary{background:#6b7280;border-color:#6b7280;color:#fff}
+  .btn-secondary:hover{background:#4b5563;border-color:#4b5563;color:#fff}
+</style>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Form Usulan Bukbel</h3>
+  </div>
+
+  <div class="card-body">
+    <form action="{?=url([ADMIN, 'hosplan', 'saveusulanbukbel'])?}" method="post">
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_rba">Kode Akun</label>
+            <select id="id_rba" class="form-control select2" name="id_rba" required>
+              <option value="">Pilih Kode Akun</option>
+              {loop: $rba}
+              <option value="{$value.id_rba}">{$value.kode_akun} - {$value.uraian_kegiatan}</option>
+              {/loop}
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="uraian">Uraian</label>
+            <input id="uraian" type="text" class="form-control" name="uraian" placeholder="Masukkan Uraian" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="tgl_faktor">Tanggal Faktur</label>
+            <input id="tgl_faktor" type="text" class="form-control" name="tgl_faktor" placeholder="Masukkan Tanggal Faktur" required>
+          </div>
+
+          <div class="col-md-6 mb-3" style="margin-top: 12px;">
+            <label for="no_faktor">No Faktur</label>
+            <input type="text" class="form-control" id="no_faktor" name="no_faktor" placeholder="No Faktur" required>
+            <small id="no_faktor_error" class="text-danger"></small>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="toko">Perusahaan / Toko</label>
+            <input type="text" class="form-control" id="toko" name="toko" placeholder="Masukkan Perusahaan / Toko" required>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="jumlah">Jumlah</label>
+            <input type="text" class="form-control" id="jumlah" name="jumlah" placeholder="Masukkan Jumlah" required>
+          </div>
+
+          <div class="col-md-4 mb-3" style="margin-top: 12px;">
+            <label for="status_spj">Status SPJ</label>
+            <select class="form-control" id="status_spj" name="status_spj" placeholder="Status SPJ" required>
+                <option value="">Pilih Status SPJ</option>
+                <option value="Belum">Belum</option>
+                <option value="Sudah">Sudah</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12 mb-3" style="margin-top: 12px;">
+            <label for="keterangan">Keterangan</label>
+            <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Masukkan Keterangan" required>
+          </div>
+        </div>
+
+        <div class="modal-footer justify-content-between">
+            <a href="{?=url([ADMIN, 'hosplan', 'usulanbukbel'])?}" class="btn btn-secondary">Kembali</a>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+$(function(){
+  var storageKey = 'bukbel:selectedRba';
+  var form = $("form[action*='saveusulanbukbel']");
+  form.on('submit', function(){
+    try { localStorage.setItem(storageKey, $('#id_rba').val() || ''); } catch(e) {}
+  });
+});
+</script>
+
+<script>
+$(document).ready(function() {
+  $('.select2').select2({
+    placeholder: "Pilih & Ketik minimal 3 huruf untuk mencari...",
+    width: '100%',
+    language: {
+      inputTooShort: function() {
+        return "Ketik minimal 3 huruf untuk mencari";
+      },
+      noResults: function() {
+        return "Tidak ada hasil ditemukan";
+      }
+    }
+  });
+
+  function onlyDigits(str){ return String(str || '').replace(/\D+/g,''); }
+  function toInt(str){ var s = onlyDigits(str); var n = parseInt(s,10); return isNaN(n) ? 0 : n; }
+  function formatId(n){ return (n||0).toLocaleString('id-ID'); }
+
+  $('#jumlah').on('input', function(){
+    var n = toInt(this.value);
+    this.value = formatId(n);
+  });
+
+  $('form[action*="saveusulanbukbel"]').on('submit', function(){
+    var j = toInt($('#jumlah').val());
+    $('#jumlah').val(j);
+  });
+  try {
+    var p = new URLSearchParams(window.location.search);
+    if (p.get('error') === 'nofaktor') {
+      $('#no_faktor_error').text('No Faktur sudah ada');
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({ icon: 'error', title: 'No Faktur sudah ada', text: 'Nomor faktor yang dimasukkan telah terinput sebelumnya.', confirmButtonText: 'OK' });
+      } else {
+        alert('No Faktur sudah ada');
+      }
+    }
+  } catch(e) {}
+
+  // Validasi AJAX no_faktor duplikat saat blur dan sebelum submit
+  function cekNoFaktor(no, excludeId, cb){
+    if (!no) { cb(false); return; }
+    var base = '{?=url([ADMIN, "hosplan", "checknofaktorbukbel"]) ?}';
+    var delim = base.indexOf('?') === -1 ? '?' : '&';
+    var url = base + delim + 'no_faktor=' + encodeURIComponent(no) + (excludeId ? ('&exclude_id=' + excludeId) : '');
+    $.ajax({ url: url, dataType: 'json' }).done(function(res){ cb(!!(res && res.exists)); }).fail(function(){ cb(false); });
+  }
+  $('#no_faktor').on('blur', function(){
+    var v = this.value.trim();
+    var $err = $('#no_faktor_error');
+    $err.text('');
+    cekNoFaktor(v, 0, function(exists){ if (exists) { $err.text('No Faktur sudah ada'); } });
+  });
+
+  $("form[action*='saveusulanbukbel']").on('submit', function(e){
+    var v = $('#no_faktor').val().trim();
+    var $err = $('#no_faktor_error');
+    if (!v) return; // biar validasi required yang jalan
+    var form = this;
+    e.preventDefault();
+    cekNoFaktor(v, 0, function(exists){
+      if (exists) {
+        $err.text('No Faktur sudah ada');
+        if (typeof Swal !== 'undefined') Swal.fire({ icon:'error', title:'No Faktur sudah ada' });
+      } else {
+        HTMLFormElement.prototype.submit.call(form);
+      }
+    });
+  });
+});
+</script>
