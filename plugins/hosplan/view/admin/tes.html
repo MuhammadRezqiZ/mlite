@@ -72,6 +72,45 @@
     filter: brightness(1.05);
     color: #fff;
   }
+  @media (min-width: 992px) {
+    .modal-xl {
+      width: 90%;
+      max-width: 1200px;
+    }
+  }
+
+  /* Enhanced Table & Text Truncation */
+  .cell-text-limit {
+    max-width: 220px;
+    display: -webkit-box;
+    --webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 2px;
+  }
+  .table-modern thead th {
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    color: white;
+    vertical-align: middle;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    padding: 15px;
+  }
+  .table-modern tbody td {
+    vertical-align: top;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .table-modern tbody tr:hover {
+    background-color: #f8faff !important;
+  }
   .btn-icon-action {
     width: 34px;
     height: 34px;
@@ -180,9 +219,14 @@
               margin-bottom: 14px;
             "
           >
-            <a href="{?=url([ADMIN, 'hosplan', 'tambahsurattelaahan'])?}&unit={?=$selectedUnit?}&t={?=$_GET['t']?}"
-                       class="btn btn-primary btn-sm"><i class="fa fa-plus mr-1"></i>&nbsp; Tambah Surat Telaahan</a>
-                  </div>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-toggle="modal"
+              data-target="#telaahanModal"
+            >
+              <i class="fa fa-plus mr-1"></i>&nbsp; Tambah Surat Telaahan
+            </button>
           </div>
           <form
             id="formCetakTelaahan"
@@ -194,21 +238,27 @@
             <table
               id="tabelSuratTelaahan"
               class="table table-modern"
-              style="width: 100%;"
+              style="width: 100%; border-collapse: separate; border-spacing: 0"
             >
               <thead>
                 <tr>
-                  <th width="5%">
+                  <th
+                    class="text-center"
+                    width="5%"
+                    style="border-radius: 10px 0 0 10px"
+                  >
                     No.
                   </th>
                   <th width="12%">Detail Surat</th>
                   <th width="21%">Masalah & Pra-Anggapan</th>
                   <th width="21%">Fakta & Pembahasan</th>
                   <th width="21%">Saran & Penutup</th>
-                  <th class="text-center" width="6%">Unit</th>
+                  <th class="text-center" width="10%">Unit</th>
                   <th
                     class="text-center"
-                    width="10%">
+                    width="10%"
+                    style="border-radius: 0 10px 10px 0"
+                  >
                     Aksi
                   </th>
                 </tr>
@@ -250,7 +300,7 @@
                       <strong
                         style="
                           font-size: 0.8em;
-                          color: #000;
+                          color: #0056b3;
                           letter-spacing: 0.5px;
                           text-transform: uppercase;
                         "
@@ -267,7 +317,7 @@
                       <strong
                         style="
                           font-size: 0.8em;
-                          color: #000;
+                          color: #0056b3;
                           letter-spacing: 0.5px;
                           text-transform: uppercase;
                         "
@@ -286,7 +336,7 @@
                       <strong
                         style="
                           font-size: 0.8em;
-                          color: #000;
+                          color: #0056b3;
                           letter-spacing: 0.5px;
                           text-transform: uppercase;
                         "
@@ -300,7 +350,7 @@
                       <strong
                         style="
                           font-size: 0.8em;
-                          color: #000;
+                          color: #0056b3;
                           letter-spacing: 0.5px;
                           text-transform: uppercase;
                         "
@@ -316,7 +366,7 @@
                       <strong
                         style="
                           font-size: 0.8em;
-                          color: #000;
+                          color: #0056b3;
                           letter-spacing: 0.5px;
                           text-transform: uppercase;
                         "
@@ -333,7 +383,7 @@
                       <strong
                         style="
                           font-size: 0.8em;
-                          color: #000;
+                          color: #0056b3;
                           letter-spacing: 0.5px;
                           text-transform: uppercase;
                         "
@@ -369,10 +419,13 @@
                         data-toggle="tooltip"
                         ><i class="fa fa-print"></i
                       ></a>
-                      <a
-                        href="{?= url([ADMIN, 'hosplan', 'editsurattelaahan', $value['id_surat']])?}"
+                      <button
+                        type="button"
                         class="btn-icon-action bg-gradient-success edit-btn"
-                        ><i class="fa fa-edit"></i></a>
+                        data-json="{$value.json_data}"
+                      >
+                        <i class="fa fa-pencil"></i>
+                      </button>
                       <a
                         href="{?= url([ADMIN, 'hosplan', 'deletesurattelaahan', $value['id_surat']])?}"
                         class="btn-icon-action bg-gradient-danger btn-hapus"
@@ -389,6 +442,294 @@
           </form>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="telaahanModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document">
+    <div
+      class="modal-content"
+      style="
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      "
+    >
+      <form
+        method="post"
+        action="{?=url([ADMIN, 'hosplan', 'tambahsurattelaahan'])?}"
+        id="telaahanForm"
+      >
+        <input type="hidden" name="id_surat" id="id_surat_input" />
+        <div
+          class="modal-header"
+          style="
+            background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 20px;
+          "
+        >
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            style="color: white; opacity: 1"
+          >
+            &times;
+          </button>
+          <h4
+            class="modal-title"
+            id="telaahanModalTitle"
+            style="font-weight: 600"
+          >
+            <i class="fa fa-pencil-square-o" style="color:#fff;"></i>
+            <span style="color: #fff">Tambah Surat Telaahan</span>
+          </h4>
+        </div>
+
+        <div
+          class="modal-body"
+          style="padding: 25px; background-color: #f8f9fa"
+        >
+          <!-- Row 1: No Surat & Tanggal -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="no_surat" style="font-weight: 600; color: #495057"
+                  >Nomor Surat</label
+                >
+                <div class="input-group">
+                  <span
+                    class="input-group-addon"
+                    style="background-color: #fff; border-right: 0"
+                    ><i class="fa fa-hashtag text-primary"></i
+                  ></span>
+                  <input
+                    id="no_surat"
+                    type="text"
+                    class="form-control"
+                    name="no_surat"
+                    placeholder="Contoh: 001/RSHD/2025"
+                    style="border-left: 0"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="tgl_surat" style="font-weight: 600; color: #495057"
+                  >Tanggal Surat</label
+                >
+                <div class="input-group">
+                  <span
+                    class="input-group-addon"
+                    style="background-color: #fff; border-right: 0"
+                    ><i class="fa fa-calendar text-primary"></i
+                  ></span>
+                  <input
+                    id="tgl_surat"
+                    type="date"
+                    class="form-control"
+                    name="tgl_surat"
+                    style="border-left: 0"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Perihal -->
+          <div class="form-group">
+            <label for="perihal" style="font-weight: 600; color: #495057"
+              >Perihal Surat</label
+            >
+            <div class="input-group">
+              <span
+                class="input-group-addon"
+                style="background-color: #fff; border-right: 0"
+                ><i class="fa fa-envelope-o text-primary"></i
+              ></span>
+              <input
+                id="perihal"
+                type="text"
+                class="form-control"
+                name="perihal"
+                placeholder="Perihal utama surat telaahan..."
+                style="border-left: 0"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Row 3: Permasalahan & Pra Anggapan -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  for="permasalahan"
+                  style="font-weight: 600; color: #495057"
+                  >Permasalahan</label
+                >
+                <textarea
+                  id="permasalahan"
+                  class="form-control"
+                  name="permasalahan"
+                  rows="3"
+                  placeholder="Uraikan permasalahan..."
+                  style="resize: vertical"
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  for="pra_anggapan"
+                  style="font-weight: 600; color: #495057"
+                  >Pra Anggapan</label
+                >
+                <textarea
+                  id="pra_anggapan"
+                  class="form-control"
+                  name="pra_anggapan"
+                  rows="3"
+                  placeholder="Pra anggapan terkait masalah..."
+                  style="resize: vertical"
+                  required
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: Fakta & Pembahasan -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="fakta" style="font-weight: 600; color: #495057"
+                  >Fakta-Fakta</label
+                >
+                <textarea
+                  id="fakta"
+                  class="form-control"
+                  name="fakta"
+                  rows="3"
+                  placeholder="Fakta-fakta di lapangan..."
+                  style="resize: vertical"
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="pembahasan" style="font-weight: 600; color: #495057"
+                  >Pembahasan</label
+                >
+                <textarea
+                  id="pembahasan"
+                  class="form-control"
+                  name="pembahasan"
+                  rows="3"
+                  placeholder="Analisis dan pembahasan..."
+                  style="resize: vertical"
+                  required
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 5: Saran Tindakan & Penutup -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  for="saran_tindakan"
+                  style="font-weight: 600; color: #495057"
+                  >Saran Tindakan</label
+                >
+                <textarea
+                  id="saran_tindakan"
+                  class="form-control"
+                  name="saran_tindakan"
+                  rows="3"
+                  placeholder="Rekomendasi tindakan..."
+                  style="resize: vertical"
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="penutup" style="font-weight: 600; color: #495057"
+                  >Penutup</label
+                >
+                <textarea
+                  id="penutup"
+                  class="form-control"
+                  name="penutup"
+                  rows="3"
+                  placeholder="Kalimat penutup..."
+                  style="resize: vertical"
+                  required
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 6: Unit -->
+          <div class="form-group">
+            <label for="id_unit_modal" style="font-weight: 600; color: #495057"
+            >Unit</label>
+            <select
+              id="id_unit_modal"
+              class="form-control"
+              name="id_unit"
+              required
+            >
+            <option value="">-- Pilih Unit --</option>
+              {loop: $unit}
+              <option value="{$value.id_unit}">{?= $value['nama_unit'] ?}</option>
+              {/loop}
+            </select>
+          </div>
+        </div>
+
+        <div
+          class="modal-footer"
+          style="
+            border-top: 1px solid #e9ecef;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 0 0 15px 15px;
+          "
+        >
+          <button
+            type="button"
+            class="btn btn-default btn-sm pull-left"
+            data-dismiss="modal"
+            style="border-radius: 6px"
+          >
+            <i class="fa fa-times"></i> Batal
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-sm"
+            style="
+              border-radius: 6px;
+              padding-left: 20px;
+              padding-right: 20px;
+              background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+              border: none;
+              box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+            "
+          >
+            <i class="fa fa-save"></i> Simpan Telaahan
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -586,6 +927,79 @@
         filterForm.submit();
       }
     })();
+
+    // Edit Button Click Handler
+    $("#tabelSuratTelaahan").on("click", ".edit-btn", function (e) {
+      e.preventDefault();
+
+      var rawData = $(this).attr("data-json");
+      var data = null;
+
+      if (rawData) {
+        try {
+          var decodedString = decodeURIComponent(escape(window.atob(rawData)));
+          data = JSON.parse(decodedString);
+        } catch (err) {
+          console.error("Failed to parse JSON data", err);
+          return;
+        }
+      }
+
+      if (!data) {
+          console.error("No data found for edit");
+          return;
+      }
+
+      // Populate form
+      $("#id_surat_input").val(data.id_surat);
+      $("#no_surat").val(data.no_surat);
+      $("#tgl_surat").val(data.tgl_surat);
+      $("#perihal").val(data.perihal);
+      $("#permasalahan").val(data.permasalahan);
+      $("#pra_anggapan").val(data.pra_anggapan);
+      $("#fakta").val(data.fakta);
+      $("#pembahasan").val(data.pembahasan);
+      $("#saran_tindakan").val(data.saran_tindakan);
+      $("#penutup").val(data.penutup);
+
+      // Select2 update
+      var id_unit = data.id_unit;
+      if ($("#id_unit_modal").hasClass("select2-hidden-accessible")) {
+        $("#id_unit_modal").val(id_unit).trigger("change");
+      } else {
+        $("#id_unit_modal").val(id_unit);
+      }
+
+      // Change form action and title
+      $("#telaahanForm").attr(
+        "action",
+        '{?=url([ADMIN, "hosplan", "updatesurattelaahan"])?}',
+      );
+      $("#telaahanModalTitle").html(
+        '<i class="fa fa-pencil-square-o" style="color:#fff;"></i> <span style="color: #fff">Edit Surat Telaahan</span>',
+      );
+
+      // Show Modal
+      $("#telaahanModal").modal("show");
+    });
+
+    // Reset Form on Modal Close
+    $("#telaahanModal").on("hidden.bs.modal", function () {
+      $("#telaahanForm")[0].reset();
+      $("#id_surat_input").val("");
+      $("#telaahanForm").attr(
+        "action",
+        '{?=url([ADMIN, "hosplan", "tambahsurattelaahan"])?}',
+      );
+      $("#telaahanModalTitle").html(
+        '<i class="fa fa-pencil-square-o" style="color:#fff;"></i> <span style="color: #fff">Tambah Surat Telaahan</span>',
+      );
+      if ($("#id_unit_modal").hasClass("select2-hidden-accessible")) {
+        $("#id_unit_modal").val("").trigger("change");
+      } else {
+        $("#id_unit_modal").val("");
+      }
+    });
 
     $("#tabelSuratTelaahan").on("click", ".btn-hapus", function (e) {
       e.preventDefault();

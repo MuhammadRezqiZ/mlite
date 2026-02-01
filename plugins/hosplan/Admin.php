@@ -153,6 +153,13 @@ class Admin extends AdminModule
       }
 
       $tabel_suratusulan = $query->toArray();
+
+      if (is_array($tabel_suratusulan)) {
+              foreach ($tabel_suratusulan as &$row) {
+                  $row['json_data'] = base64_encode(json_encode($row));
+              }
+          }
+
       $totalUploadSuratUsulan = is_array($tabel_suratusulan) ? count($tabel_suratusulan) : 0;
       $isUnitSelected = ($userUnitId && $userUnitId > 0);
 
@@ -370,12 +377,21 @@ class Admin extends AdminModule
       ]);
     }
 
-    public function postTambahSuratTelaahan()
+    public function getTambahSuratTelaahan()
+    {
+      $unit = $this->db('hosplan_unit')->toArray();
+
+      return $this->draw('tambahsurattelaahan.html', [
+        'unit' => $unit,
+        'userUnitId' => $this->_getUserUnitId()
+      ]);
+    }
+
+    public function postSaveSuratTelaahan()
     {
       $userUnitId = $this->_getUserUnitId();
       $role = $this->core->getUserInfo('role');
       $idUnitToSave = ($role === 'admin') ? $_POST['id_unit'] : ($userUnitId ?: $_POST['id_unit']);
-
       $this->db('hosplan_telaahan')->save([
         'no_surat' => $_POST['no_surat'],
         'tgl_surat' => $_POST['tgl_surat'],
@@ -394,6 +410,28 @@ class Admin extends AdminModule
       redirect(url([ADMIN, 'hosplan', 'surattelaahan'], ['unit' => $unit]));
     }
 
+    public function getEditSuratTelaahan($id_surat)
+    {
+      $this->_addHeaderFiles();
+
+      $unit = $this->db('hosplan_unit')
+            ->toArray();
+    
+      $surattelaahan = $this->db('hosplan_telaahan')
+          ->join('hosplan_unit', 'hosplan_unit.id_unit=hosplan_telaahan.id_unit')
+          ->where('hosplan_telaahan.id_surat', $id_surat)
+          ->toArray();
+    
+      if (!$surattelaahan) {
+          return $this->draw('error.html', ['message' => 'Surat Telaahan tidak ditemukan']);
+      }
+    
+      return $this->draw('editsurattelaahan.html', [
+          'surattelaahan' => $surattelaahan[0],
+          'unit'  => $unit,
+      ]);
+    }
+
     public function postUpdateSuratTelaahan()
     {
       if (!isset($_POST['id_surat'])) {
@@ -409,9 +447,9 @@ class Admin extends AdminModule
           return;
       }
 
-      $userUnitId = $this->_getUserUnitId();
-      $role = $this->core->getUserInfo('role');
-      $idUnitToSave = ($role === 'admin') ? $_POST['id_unit'] : ($userUnitId ?: $_POST['id_unit']);
+      // $userUnitId = $this->_getUserUnitId();
+      // $role = $this->core->getUserInfo('role');
+      // $idUnitToSave = ($role === 'admin') ? $_POST['id_unit'] : ($userUnitId ?: $_POST['id_unit']);
 
       $this->db('hosplan_telaahan')
         ->where('id_surat', $id_surat)
@@ -424,8 +462,8 @@ class Admin extends AdminModule
             'fakta' => $_POST['fakta'],
             'pembahasan' => $_POST['pembahasan'],
             'saran_tindakan' => $_POST['saran_tindakan'],
-            'penutup' => $_POST['penutup'],
-            'id_unit' => $idUnitToSave,
+            // Non-admin tidak boleh mengubah ke unit lain
+            'id_unit' => ($this->core->getUserInfo('role') === 'admin') ? $_POST['id_unit'] : ($this->_getUserUnitId() ?: $_POST['id_unit']),
         ]);
 
       $unit = isset($_GET['unit']) ? $_GET['unit'] : '';
