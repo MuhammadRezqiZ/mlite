@@ -3,10 +3,24 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <style>
-  .form-group label { font-weight: 500; margin-bottom: 6px; }
-  .select2-container .select2-selection--single { height: 38px; border-radius: 6px; border: 1px solid #ced4da; }
-  .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 38px; padding-left: 10px; }
-  .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px; }
+  :root{--bg-soft:#f8fafc;--border-soft:#e5e7eb;--text-muted:#64748b;--primary:#0ea5e9;--primary-dark:#0284c7}
+  .card{border:1px solid var(--border-soft);border-radius:14px;box-shadow:0 8px 28px rgba(2,8,23,.08);overflow:hidden;background:#fff}
+  .card-header{background:linear-gradient(180deg,#f8fafc,#ffffff);border-bottom:1px solid var(--border-soft);padding:16px 18px}
+  .card-header h3{margin:0;font-weight:700;color:#0f172a}
+  .card-body{padding:18px}
+  .form-group label{font-weight:600;color:#374151;margin-bottom:6px;display:block}
+  .form-control{border:1px solid var(--border-soft);border-radius:10px;box-shadow:none;height:42px}
+  .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(14,165,233,.2)}
+  .select2-container{width:100% !important}
+  .select2-container .select2-selection--single{height:42px;border-radius:10px;border:1px solid var(--border-soft)}
+  .select2-container--default .select2-selection--single .select2-selection__rendered{line-height:42px;padding-left:12px}
+  .select2-container--default .select2-selection--single .select2-selection__arrow{height:40px}
+  .modal-footer{border-top:1px solid var(--border-soft);background:#fff;padding:14px}
+  .btn{border-radius:10px}
+  .btn-primary{background:var(--primary);border-color:var(--primary)}
+  .btn-primary:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+  .btn-secondary{background:#6b7280;border-color:#6b7280;color:#fff}
+  .btn-secondary:hover{background:#4b5563;border-color:#4b5563;color:#fff}
 </style>
 
 <div class="card">
@@ -20,12 +34,12 @@
 
         <div class="row">
           <div class="col-md-6 mb-3" style="margin-top: 12px;">
-            <label for="no_surat">Nomor Surat</label>
+            <label for="no_surat">Nomor Surat <i class="text-danger">*</i></label>
             <input id="no_surat" type="text" class="form-control" name="no_surat" placeholder="Masukkan Nomor Surat" value="{$uploadbukbel.no_surat}" required>
           </div>
 
           <div class="col-md-6 mb-3" style="margin-top: 12px;">
-            <label for="id_rba">Pengirim</label>
+            <label for="id_rba">Pengirim <i class="text-danger">*</i></label>
             <select id="id_pptk" class="form-control select2" name="id_pptk" required>
               <option value="">Pilih PPTK</option>
               {loop: $pptk}
@@ -37,12 +51,12 @@
 
         <div class="row">
           <div class="col-md-4 mb-3" style="margin-top: 12px;">
-            <label for="tanggal_usulan">Tanggal Surat</label>
+            <label for="tanggal_usulan">Tanggal Surat <i class="text-danger">*</i></label>
             <input id="tanggal_usulan" type="date" class="form-control" name="tanggal_usulan" value="{$uploadbukbel.tanggal_usulan}" required>
           </div>
 
           <div class="col-md-4 mb-3" style="margin-top: 12px;">
-            <label for="id_jenis_usulan">Jenis Usulan</label>
+            <label for="id_jenis_usulan">Jenis Usulan <i class="text-danger">*</i></label>
             <select id="id_jenis_usulan" class="form-control" name="id_jenis_usulan" required>
               <option value="">Pilih Jenis Usulan</option>
               {loop: $jenis}
@@ -51,7 +65,7 @@
             </select>
           </div>
           <div class="col-md-4 mb-3" style="margin-top: 12px;">
-            <label for="id_status_surat">Status Usulan</label>
+            <label for="id_status_surat">Status Usulan <i class="text-danger">*</i></label>
             <select id="id_status_surat" class="form-control" name="id_status_surat" required>
               <option value="">Pilih Status Usulan</option>
               {loop: $status}
@@ -63,7 +77,7 @@
 
         <div class="row">
           <div class="col-md-6 mb-3" style="margin-top: 12px;">
-            <label for="perihal">Perihal</label>
+            <label for="perihal">Perihal <i class="text-danger">*</i></label>
             <input id="perihal" type="text" class="form-control" name="perihal" value="{$uploadbukbel.perihal}" placeholder="Masukkan Perihal" required>
           </div>
           <div class="col-md-6 mb-3" style="margin-top: 12px;">
@@ -71,12 +85,14 @@
             <input id="file_usulan" type="file" class="form-control" name="file_usulan" accept=".pdf,.doc,.docx">
             <small id="file_usulan_error" class="text-danger"></small>
             {if: !empty($uploadbukbel.file_usulan)}
-            <small class="text-muted">File saat ini:
-              {if: !empty($uploadbukbel.file_url)}
-                <a href="{?= url($uploadbukbel.file_url) ?}" target="_blank" rel="noopener noreferrer">{$uploadbukbel.file_usulan}</a>
-              {/if}
-              {if: empty($uploadbukbel.file_url)}{$uploadbukbel.file_usulan}{/if}
-            </small>
+            <div style="margin-top: 5px;">
+              <small class="text-muted">File saat ini:
+                {if: !empty($uploadbukbel.file_url)}
+                  <a href="{?= url($uploadbukbel.file_url) ?}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline;">{$uploadbukbel.file_usulan}</a>
+                {/if}
+                {if: empty($uploadbukbel.file_url)}{$uploadbukbel.file_usulan}{/if}
+              </small>
+            </div>
             {/if}
         </div>
         </div>
@@ -89,7 +105,7 @@
         </div>
 
         <div class="modal-footer justify-content-between">
-            <a href="{?=url([ADMIN, 'hosplan', 'uploadusulanbukbel'], ['id_pptk' => $uploadbukbel.id_pptk])?}" class="btn btn-secondary">Kembali</a>
+            <a href="{?=url([ADMIN, 'hosplan', 'uploadusulanbukbel'])?}" class="btn btn-secondary">Kembali</a>
             <button type="submit" class="btn btn-primary">Simpan</button>
         </div>
 
@@ -98,9 +114,11 @@
 </div>
 
 <script>
-$(document).ready(function(){
-  if ($.fn.select2) { $('.select2').select2({ placeholder: 'Cari...', width: '100%' }); }
-  var MAX_FILE_SIZE = 5 * 1024 * 1024;
+$(document).ready(function() {
+  if ($.fn.select2) {
+    $('.select2').select2({ placeholder: 'Cari...', width: '100%' });
+  }
+  var MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
   var $fileInput = $('#file_usulan');
   var $errorEl = $('#file_usulan_error');
   var $submitBtn = $('button[type="submit"]');

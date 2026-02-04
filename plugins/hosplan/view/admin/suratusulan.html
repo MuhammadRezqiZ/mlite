@@ -60,72 +60,6 @@
     filter:brightness(1.05);
     color:#fff;
   }
-  @media (min-width: 992px) {
-    .modal-xl {
-      width: 90%;
-      max-width: 1200px;
-    }
-  }
-
-  /* Enhanced Table & Text Truncation */
-  .cell-text-limit {
-    max-width: 220px;
-    display: -webkit-box;
-    --webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.4;
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 2px;
-  }
-  .table-modern thead th {
-    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
-    color: white;
-    vertical-align: middle;
-    border: none;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    padding: 15px;
-  }
-  .table-modern tbody td {
-    vertical-align: top;
-    padding: 15px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  .table-modern tbody tr:hover {
-    background-color: #f8faff !important;
-  }
-  .btn-icon-action {
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    margin: 0 3px;
-    color: white;
-    border: none;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s;
-  }
-  .btn-icon-action:hover {
-    transform: translateY(-3px);
-    color: white;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
-  }
-  .bg-gradient-info {
-    background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%);
-  }
-  .bg-gradient-success {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-  }
-  .bg-gradient-danger {
-    background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
-  }
 </style>
 
 <div class="back" style="margin-bottom: 20px; text-align: right;">
@@ -178,15 +112,15 @@
                   <form id="formCetakUsulanRKA" action="{?= url([ADMIN, 'hosplan', 'cetaksuratusulan']) ?}" method="post">
                     <input type="hidden" name="t" value="{?=$_GET['t']?}">
 
-                    <table id="tabelSuratUsulan" class="table table-modern" style="width: 100%; border-collapse: separate; border-spacing: 0">
+                    <table id="tabelSuratUsulan" class="table table-striped table-hover" style="width:100%">
                         <thead>
                             <tr>
-                                <th class="text-center" width="5%" style="border-radius: 10px 0 0 10px">Nomor Surat</th>
+                                <th style="text-align: center;">Nomor Surat</th>
                                 <th style="text-align: center;">Tanggal Surat</th>
                                 <th style="text-align: center;">Lampiran Surat</th>
                                 <th style="text-align: center;">Perihal Surat</th>
                                 <th style="text-align: center;">Dari Unit</th>
-                                <th style="text-align: center; border-radius: 0 10px 10px 0">Aksi</th>
+                                <th style="text-align: center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -198,10 +132,10 @@
                                 <td>{$value.lampiran}</td>
                                 <td>{$value.perihal}</td>
                                 <td>{$value.nama_unit}</td>
-                                <td width="15%" class="text-center">
-                                    <a href="{?= url([ADMIN, 'hosplan', 'cetaksuratusulan', $value['id_surat']])?}" target="_blank" class="btn-icon-action bg-gradient-info"><i class="fa fa-print"></i></a>
-                                    <a href="{?=url([ADMIN, 'hosplan', 'editsuratusulan', $value['id_surat']])?}" class="btn-icon-action bg-gradient-success edit-btn"><i class="fa fa-edit"></i></a>
-                                    <a href="{?= url([ADMIN, 'hosplan', 'deletesuratusulan', $value['id_surat']])?}" class="btn-icon-action bg-gradient-danger btn-hapus"><i class="fa fa-trash"></i></a>
+                                <td width="20%" class="text-center">
+                                    <a href="{?= url([ADMIN, 'hosplan', 'cetaksuratusulan', $value['id_surat']])?}" target="_blank" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</a>
+                                    <a href="{?=url([ADMIN, 'hosplan', 'editsuratusulan', $value['id_surat']])?}" class="btn btn-success btn-sm"><i class="fa fa-edit"></i> Edit</a>
+                                    <a href="{?= url([ADMIN, 'hosplan', 'deletesuratusulan', $value['id_surat']])?}" class="btn btn-danger btn-sm btn-hapus"><i class="fa fa-trash"></i> Hapus
                                     </a>
                                 </td>
                             </tr>

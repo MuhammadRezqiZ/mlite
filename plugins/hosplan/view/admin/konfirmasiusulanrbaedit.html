@@ -63,7 +63,7 @@
 </style>
 
 <div class="back" style="margin-bottom: 20px; text-align: right;">
-  <a href="{?=url([ADMIN, 'hosplan', 'arsipsetuju'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
+  <a href="{?=url([ADMIN, 'hosplan', 'konfirmasiedit'])?}" class="btn-back"><i class="fa fa-arrow-left"></i>Kembali</a>
 </div>
 
 <div class="col-lg-3 col-md-6" style="margin-bottom: 40px;">
@@ -74,13 +74,13 @@
                         <i class="fa fa-clipboard fa-5x"></i>
                     </div>
                     <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
-                        <div class="huge" id="kas-masuk">{?=$jumlahBukbelSetuju?}</div>
-                        <div>Jumlah Usulan Bukbel Disetujui</div>
+                        <div class="huge" id="total-rba">{?=$totalKonfirmasiRBA?}</div>
+                        <div>Jumlah Konfirmasi Usulan RBA</div>
                     </div>
                 </div>
             </div>
             <div class="">
-                <span class="pull-left">Total Usulan Bukbel yang Disetujui terkini</span>
+                <span class="pull-left">Total Konfirmasi Usulan RBA terkini</span>
                 <span class="pull-right"><i class="fa fa-clipboard"></i></span>
                 <div class="clearfix"></div>
             </div>
@@ -91,11 +91,11 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading" style="font-size: large; ">
-                <i class="fa fa-clipboard"></i> &nbsp; <b>Data Usulan Bukbel yang Disetujui RSUD H. Damanhuri Barabai</b>
+                <i class="fa fa-clipboard"></i> &nbsp; <b>Data Konfirmasi Usulan RBA RSUD H. Damanhuri Barabai</b>
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
-                  <!-- Filter Unit -->
+                  <!-- Filter PPTK -->
                   <style>
                     .filter-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;box-shadow:0 1px 2px rgba(0,0,0,.06);margin-bottom:12px}
                     .filter-row{display:flex;align-items:center;gap:12px}
@@ -178,7 +178,7 @@
                     .modal-subtitle{font-size:13px;color:var(--text-muted)}
                     .modal-modern .form-control{border-radius:10px;border:1px solid var(--border-soft)}
                   </style>
-                  <form id="formFilterPptk" action="{?= url([ADMIN, 'hosplan', 'konfirmasiusulanbukbel']) ?}" method="get" style="margin-bottom: 20px;">
+                  <form id="formFilterPptk" action="{?= url([ADMIN, 'hosplan', 'konfirmasiusulanrbaedit']) ?}" method="get" style="margin-bottom: 20px;">
                     <div class="filter-card">
                       <div class="filter-row">
                         <label for="id_pptk" style="font-weight:600;margin:0;">Filter PPTK:</label>
@@ -194,7 +194,11 @@
                     </div>
                   </form>
 
-                    <!-- <div style="margin-bottom:10px; font-weight:600;">Total data ditemukan: {?=$totalUploadRKA?}</div> -->
+                  <!-- Toolbar Aksi (Tambah & Cetak) tampil hanya jika unit sudah dipilih) -->
+                  <form id="formCetakUsulanRBA" action="{?= url([ADMIN, 'hosplan', 'cetakusulanrba']) ?}" method="post">
+                    <input type="hidden" name="t" value="{?=$_GET['t']?}">
+
+                    <!-- <div style="margin-bottom:10px; font-weight:600;">Total data ditemukan: {?=$totalUploadRBA?}</div> -->
                     <table id="tabelSuratUsulan" class="table table-striped table-hover table-modern" style="width:100%">
                         <thead>
                             <tr>
@@ -206,11 +210,12 @@
                                 <th style="text-align: center;">Status</th>
                                 <th style="text-align: center;">Lampiran</th>
                                 <th style="text-align: center;">Keterangan</th>
+                                <th style="text-align: center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Data akan ditampilkan setelah filter unit dipilih -->
-                            {loop: $tabel_uploadusulanbukbel}
+                            {loop: $tabel_uploadusulanrba}
                             <tr>
                                 <td>{$value.no_surat}</td>
                                 <td>{?= !empty($value['tanggal_usulan']) ? date('d-m-Y', strtotime($value['tanggal_usulan'])) : '-' ?}</td>
@@ -228,6 +233,12 @@
                                   {/if}
                                 </td>
                                 <td>{$value.keterangan}</td>
+                                <td width="15%" class="text-center">
+                                    <a href="{?=url([ADMIN, 'hosplan', 'konfirmasistatusrbaedit', $value['id_usulan']])?}" class="btn btn-success btn-sm">Edit</a>
+                                    <a href="{?= url([ADMIN, 'hosplan', 'deletestatusrba', $value['id_usulan']]) ?}" 
+                                        class="btn btn-danger btn-sm btn-hapus"><i class="fa fa-trash"></i> Hapus
+                                    </a>
+                                </td>
                             </tr>
                             {/loop}
                         </tbody>
@@ -242,10 +253,10 @@
 
 <script>
 $(document).ready(function() {
-  // Aktifkan pencarian pada filter Unit
+  // Aktifkan pencarian pada filter PPTK
   if ($.fn.select2) {
     $('#id_pptk').select2({
-      placeholder: '-- Pilih Unit --',
+      placeholder: '-- Pilih PPTK --',
       allowClear: true,
       width: '100%'
     });
@@ -295,16 +306,16 @@ $(document).ready(function() {
   document.getElementById('checkAll').addEventListener('change', function() {
         document.querySelectorAll('input[name="id_usulan[]"]').forEach(cb => cb.checked = this.checked);
     });
-  // Validasi: pastikan ada checkbox terpilih sebelum submit ke cetakusulanrka.html
-  const formCetak = document.getElementById('formCetakUsulanRKA');
+  // Validasi: pastikan ada checkbox terpilih sebelum submit ke cetakusulanrba.html
+  const formCetak = document.getElementById('formCetakUsulanRBA');
   formCetak.addEventListener('submit', function(e) {
     const checked = document.querySelectorAll('input[name="id_usulan[]"]:checked');
     if (checked.length === 0) {
       e.preventDefault();
       if (typeof Swal !== 'undefined') {
-        Swal.fire({ icon: 'warning', title: 'Pilih minimal satu data usulan RKA terlebih dahulu', timer: 2000, showConfirmButton: false });
+        Swal.fire({ icon: 'warning', title: 'Pilih minimal satu data usulan RBA terlebih dahulu', timer: 2000, showConfirmButton: false });
       } else {
-        alert('Pilih minimal satu data usulan RKA terlebih dahulu');
+        alert('Pilih minimal satu data usulan RBA terlebih dahulu');
       }
     }
   });
@@ -369,31 +380,31 @@ $(document).ready(function() {
     window.history.replaceState({}, '', newUrl);
   }
 
-  // Fungsi untuk update jumlah usulan RKA
-  function updateRkaCount() {
+  // Fungsi untuk update jumlah usulan RBA
+  function updateRbaCount() {
     if (!table) return;
     // Gunakan count() agar menghitung jumlah baris hasil filter secara akurat
     var rowCount = table.rows({ search: 'applied' }).count();
-    var $counter = $('#kas-masuk');
+    var $counter = $('#total-rba');
     if ($counter.length) {
       $counter.text(rowCount);
     }
   }
 
   // Panggil fungsi saat tabel selesai diinisialisasi
-  updateRkaCount();
+  updateRbaCount();
   // Reapply badge styles setelah draw agar tetap konsisten
   applyStatusBadgeStyles();
 
   // Panggil fungsi setiap kali tabel digambar ulang (termasuk saat filtering, paginasi, atau search)
   table.on('draw', function() {
-    updateRkaCount();
+    updateRbaCount();
     applyStatusBadgeStyles();
   });
 
   // Persist filter Unit agar tidak perlu memilih ulang setelah tambah/edit/hapus
   (function persistUnitFilter(){
-    const storageKey = 'rka:selectedPptk';
+    const storageKey = 'rba:selectedPptk';
     const filterForm = document.getElementById('formFilterPptk');
     const unitSelect = document.getElementById('id_pptk');
     if (!filterForm || !unitSelect) return;
@@ -439,7 +450,7 @@ $(document).ready(function() {
           });
         } else {
           // Fallback ke konfirmasi native
-          if (confirm('Yakin ingin menghapus usulan RKA ini?')) {
+          if (confirm('Yakin ingin menghapus usulan RBA ini?')) {
             window.location.href = url;
           }
         }

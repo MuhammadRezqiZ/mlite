@@ -193,6 +193,8 @@ class Admin extends AdminModule
         'lampiran' => $_POST['lampiran'],
         'perihal' => $_POST['perihal'],
         'id_unit' => $idUnitToSave,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $unit = isset($_GET['unit']) ? $_GET['unit'] : '';
@@ -248,6 +250,7 @@ class Admin extends AdminModule
               'perihal' => $_POST['perihal'],
               // Non-admin tidak boleh mengubah ke unit lain
               'id_unit' => ($this->core->getUserInfo('role') === 'admin') ? $_POST['id_unit'] : ($this->_getUserUnitId() ?: $_POST['id_unit']),
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $unit = isset($_GET['unit']) ? $_GET['unit'] : '';
@@ -403,6 +406,8 @@ class Admin extends AdminModule
         'saran_tindakan' => $_POST['saran_tindakan'],
         'penutup' => $_POST['penutup'],
         'id_unit' => $idUnitToSave,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $unit = isset($_GET['unit']) ? $_GET['unit'] : '';
@@ -464,6 +469,7 @@ class Admin extends AdminModule
             'saran_tindakan' => $_POST['saran_tindakan'],
             // Non-admin tidak boleh mengubah ke unit lain
             'id_unit' => ($this->core->getUserInfo('role') === 'admin') ? $_POST['id_unit'] : ($this->_getUserUnitId() ?: $_POST['id_unit']),
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
 
       $unit = isset($_GET['unit']) ? $_GET['unit'] : '';
@@ -585,6 +591,8 @@ class Admin extends AdminModule
         'jumlah' => $_POST['jumlah'],
         'keterangan' => $_POST['keterangan'],
         'id_unit' => $idUnitToSave,
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $kode = isset($_GET['kode']) ? $_GET['kode'] : '';
@@ -657,7 +665,8 @@ class Admin extends AdminModule
               'id_satuan' => $_POST['id_satuan'],
               'jumlah' => $_POST['jumlah'],
               'keterangan' => $_POST['keterangan'],
-              'id_unit' => $_POST['id_unit']
+              'id_unit' => $_POST['id_unit'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $kode = isset($_GET['kode']) ? $_GET['kode'] : '';
@@ -917,6 +926,8 @@ class Admin extends AdminModule
         'jumlah' => $_POST['jumlah'],
         'keterangan' => $_POST['keterangan'],
         'id_unit' => $_POST['id_unit'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $kode = isset($_GET['kode']) ? $_GET['kode'] : '';
@@ -989,7 +1000,8 @@ class Admin extends AdminModule
               'id_satuan' => $_POST['id_satuan'],
               'jumlah' => $_POST['jumlah'],
               'keterangan' => $_POST['keterangan'],
-              'id_unit' => $_POST['id_unit']
+              'id_unit' => $_POST['id_unit'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $kode = isset($_GET['kode']) ? $_GET['kode'] : '';
@@ -1233,6 +1245,8 @@ class Admin extends AdminModule
         'id_pptk' => $_POST['id_pptk'],
         'permintaan_anggaran' => $_POST['permintaan_anggaran'],
         'total' => $_POST['total'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $rba = isset($_GET['rba']) ? $_GET['rba'] : '';
@@ -1290,7 +1304,8 @@ class Admin extends AdminModule
               'id_rba' => $_POST['id_rba'],
               'id_pptk' => $_POST['id_pptk'],
               'permintaan_anggaran' => $_POST['permintaan_anggaran'],
-              'total' => $_POST['total'], 
+              'total' => $_POST['total'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $rba = isset($_GET['rba']) ? $_GET['rba'] : '';
@@ -1468,6 +1483,8 @@ class Admin extends AdminModule
         'jumlah' => $_POST['jumlah'],
         'status_spj' => $_POST['status_spj'],
         'keterangan' => $_POST['keterangan'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $rba = isset($_GET['rba']) ? $_GET['rba'] : '';
@@ -1530,6 +1547,7 @@ class Admin extends AdminModule
               'jumlah' => $_POST['jumlah'],
               'status_spj' => $_POST['status_spj'],
               'keterangan' => $_POST['keterangan'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
 
@@ -1710,6 +1728,7 @@ class Admin extends AdminModule
               'oktober' => $_POST['oktober'],
               'november' => $_POST['november'],
               'desember' => $_POST['desember'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $rebel = isset($_GET['rebel']) ? $_GET['rebel'] : '';
@@ -1736,7 +1755,8 @@ class Admin extends AdminModule
       $update = $this->db('hosplan_rebel')
         ->where('id_rebel', $id_rebel)
         ->update([
-            $field => $clean_value
+            $field => $clean_value,
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
 
       if ($update) {
@@ -1893,7 +1913,11 @@ class Admin extends AdminModule
         }
       }
 
+      $last = $this->db('hosplan_uploadrka')->select('id_usulan')->desc('id_usulan')->limit(1)->oneArray();
+      $new_id = ($last && isset($last['id_usulan'])) ? $last['id_usulan'] + 1 : 1;
+
       $this->db('hosplan_uploadrka')->save([
+        'id_usulan' => $new_id,
         'id_surat' => $_POST['id_surat'],
         'tanggal_usulan' => $_POST['tanggal_usulan'],
         'id_jenis_usulan' => $_POST['id_jenis_usulan'],
@@ -1901,6 +1925,8 @@ class Admin extends AdminModule
         'file_usulan' => $uploaded_name,
         'keterangan' => $_POST['keterangan'],
         'id_unit' => $_POST['id_unit'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $surat = isset($_GET['surat']) ? $_GET['surat'] : '';
@@ -1933,8 +1959,8 @@ class Admin extends AdminModule
       }
 
       // Tambahkan file_url untuk tampilan edit (fallback lokasi lama)
-      $pluginFs = __DIR__ . '/uploads/usulanrka/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrka/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrka/';
+      $pluginWeb = '/uploads/hosplan/usulanrka/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       $fn = isset($uploadrka[0]['file_usulan']) ? $uploadrka[0]['file_usulan'] : '';
@@ -2009,6 +2035,7 @@ class Admin extends AdminModule
               'file_usulan' => $uploaded_name,
               'keterangan' => $_POST['keterangan'],
               'id_unit' => $_POST['id_unit'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $surat = isset($_GET['surat']) ? $_GET['surat'] : '';
@@ -2121,7 +2148,7 @@ class Admin extends AdminModule
         $maxSize = 5 * 1024 * 1024; // 5 MB
         if (isset($_FILES['file_usulan']['size']) && $_FILES['file_usulan']['size'] > $maxSize) {
           // Redirect kembali ke form dengan pesan error via query string
-          redirect(url([ADMIN, 'hosplan', 'tambahuploadrka'], ['error' => 'size']));
+          redirect(url([ADMIN, 'hosplan', 'tambahuploadrba'], ['error' => 'size']));
           return;
         }
         $ext = strtolower(pathinfo($_FILES['file_usulan']['name'], PATHINFO_EXTENSION));
@@ -2138,7 +2165,11 @@ class Admin extends AdminModule
         }
       }
 
+      $last = $this->db('hosplan_uploadrba')->select('id_usulan')->desc('id_usulan')->limit(1)->oneArray();
+      $new_id = ($last && isset($last['id_usulan'])) ? $last['id_usulan'] + 1 : 1;
+
       $this->db('hosplan_uploadrba')->save([
+        'id_usulan' => $new_id,
         'no_surat' => $_POST['no_surat'],
         'tanggal_usulan' => $_POST['tanggal_usulan'],
         'perihal' => $_POST['perihal'],
@@ -2147,6 +2178,8 @@ class Admin extends AdminModule
         'file_usulan' => $uploaded_name,
         'keterangan' => $_POST['keterangan'],
         'id_pptk' => $_POST['id_pptk'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
@@ -2176,8 +2209,8 @@ class Admin extends AdminModule
       }
 
       // Tambahkan file_url untuk tampilan edit (fallback lokasi lama)
-      $pluginFs = __DIR__ . '/uploads/usulanrba/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrba/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrba/';
+      $pluginWeb = '/uploads/hosplan/usulanrba/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       $fn = isset($uploadrba[0]['file_usulan']) ? $uploadrba[0]['file_usulan'] : '';
@@ -2252,6 +2285,7 @@ class Admin extends AdminModule
               'file_usulan' => $uploaded_name,
               'keterangan' => $_POST['keterangan'],
               'id_pptk' => $_POST['id_pptk'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
@@ -2356,7 +2390,11 @@ class Admin extends AdminModule
         }
       }
 
+      $last = $this->db('hosplan_uploadbukbel')->select('id_usulan')->desc('id_usulan')->limit(1)->oneArray();
+      $new_id = ($last && isset($last['id_usulan'])) ? $last['id_usulan'] + 1 : 1;
+
       $this->db('hosplan_uploadbukbel')->save([
+        'id_usulan' => $new_id,
         'no_surat' => $_POST['no_surat'],
         'tanggal_usulan' => $_POST['tanggal_usulan'],
         'perihal' => $_POST['perihal'],
@@ -2365,6 +2403,8 @@ class Admin extends AdminModule
         'file_usulan' => $uploaded_name,
         'keterangan' => $_POST['keterangan'],
         'id_pptk' => $_POST['id_pptk'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $pptk = isset($_POST['id_pptk']) ? $_POST['id_pptk'] : (isset($_GET['id_pptk']) ? $_GET['id_pptk'] : '');
@@ -2391,8 +2431,8 @@ class Admin extends AdminModule
       }
 
       // Tambahkan file_url untuk tampilan edit (fallback lokasi lama)
-      $pluginFs = __DIR__ . '/uploads/usulanbukbel/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanbukbel/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanbukbel/';
+      $pluginWeb = '/uploads/hosplan/usulanbukbel/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       $fn = isset($upload[0]['file_usulan']) ? $upload[0]['file_usulan'] : '';
@@ -2462,6 +2502,7 @@ class Admin extends AdminModule
           'file_usulan' => $uploaded_name,
           'keterangan' => $_POST['keterangan'],
           'id_pptk' => $_POST['id_pptk'],
+          'updated_at' => date('Y-m-d H:i:s')
         ]);
 
       $pptk = isset($_POST['id_pptk']) ? $_POST['id_pptk'] : (isset($cek['id_pptk']) ? $cek['id_pptk'] : (isset($_GET['id_pptk']) ? $_GET['id_pptk'] : ''));
@@ -2568,8 +2609,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrka = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrka/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrka/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrka/';
+      $pluginWeb = '/uploads/hosplan/usulanrka/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrka)) {
@@ -2625,8 +2666,8 @@ class Admin extends AdminModule
 
       // Bangun URL file lampiran untuk pratinjau pada halaman konfirmasi status
       if ($uploadrka && isset($uploadrka[0])) {
-        $pluginFs = __DIR__ . '/uploads/usulanrka/';
-        $pluginWeb = '/plugins/hosplan/uploads/usulanrka/';
+        $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrka/';
+        $pluginWeb = '/uploads/hosplan/usulanrka/';
         $legacyFs = __DIR__ . '/../../uploads/surat/';
         $legacyWeb = '/uploads/surat/';
         $fn = isset($uploadrka[0]['file_usulan']) ? $uploadrka[0]['file_usulan'] : '';
@@ -2675,6 +2716,7 @@ class Admin extends AdminModule
               'id_usulan' => $id_usulan,
               'id_status_surat' => $_POST['id_status_surat'],
               'keterangan' => $_POST['keterangan'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $surat = isset($_GET['surat']) ? $_GET['surat'] : '';
@@ -2710,8 +2752,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrba = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrba/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrba/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrba/';
+      $pluginWeb = '/uploads/hosplan/usulanrba/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrba)) {
@@ -2764,8 +2806,8 @@ class Admin extends AdminModule
 
       // Bangun URL file lampiran untuk pratinjau pada halaman konfirmasi status RBA
       if ($uploadrba && isset($uploadrba[0])) {
-        $pluginFs = __DIR__ . '/uploads/usulanrba/';
-        $pluginWeb = '/plugins/hosplan/uploads/usulanrba/';
+        $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrba/';
+        $pluginWeb = '/uploads/hosplan/usulanrba/';
         $legacyFs = __DIR__ . '/../../uploads/surat/';
         $legacyWeb = '/uploads/surat/';
         $fn = isset($uploadrba[0]['file_usulan']) ? $uploadrba[0]['file_usulan'] : '';
@@ -2813,6 +2855,7 @@ class Admin extends AdminModule
               'id_usulan' => $id_usulan,
               'id_status_surat' => $_POST['id_status_surat'],
               'keterangan' => $_POST['keterangan'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
@@ -2847,8 +2890,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanbukbel = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanbukbel/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanbukbel/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanbukbel/';
+      $pluginWeb = '/uploads/hosplan/usulanbukbel/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanbukbel)) {
@@ -2901,8 +2944,8 @@ class Admin extends AdminModule
 
       // Bangun URL file lampiran untuk pratinjau pada halaman konfirmasi status Bukbel
       if ($uploadbukbel && isset($uploadbukbel[0])) {
-        $pluginFs = __DIR__ . '/uploads/usulanbukbel/';
-        $pluginWeb = '/plugins/hosplan/uploads/usulanbukbel/';
+        $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanbukbel/';
+        $pluginWeb = '/uploads/hosplan/usulanbukbel/';
         $legacyFs = __DIR__ . '/../../uploads/surat/';
         $legacyWeb = '/uploads/surat/';
         $fn = isset($uploadbukbel[0]['file_usulan']) ? $uploadbukbel[0]['file_usulan'] : '';
@@ -2949,6 +2992,7 @@ class Admin extends AdminModule
               'id_usulan' => $id_usulan,
               'id_status_surat' => $_POST['id_status_surat'],
               'keterangan' => $_POST['keterangan'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
@@ -3021,8 +3065,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrka = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrka/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrka/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrka/';
+      $pluginWeb = '/uploads/hosplan/usulanrka/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrka)) {
@@ -3089,8 +3133,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrka = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrka/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrka/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrka/';
+      $pluginWeb = '/uploads/hosplan/usulanrka/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrka)) {
@@ -3155,8 +3199,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrba = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrba/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrba/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrba/';
+      $pluginWeb = '/uploads/hosplan/usulanrba/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrba)) {
@@ -3219,8 +3263,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrba = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrba/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrba/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrba/';
+      $pluginWeb = '/uploads/hosplan/usulanrba/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrba)) {
@@ -3283,8 +3327,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanbukbel = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanbukbel/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanbukbel/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanbukbel/';
+      $pluginWeb = '/uploads/hosplan/usulanbukbel/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanbukbel)) {
@@ -3347,8 +3391,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanbukbel = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanbukbel/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanbukbel/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanbukbel/';
+      $pluginWeb = '/uploads/hosplan/usulanbukbel/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanbukbel)) {
@@ -3479,6 +3523,8 @@ class Admin extends AdminModule
         'perubahan' => $_POST['perubahan'],
         'pergeseran' => $_POST['pergeseran'],
         'realisasi' => $_POST['realisasi'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $rba = isset($_GET['rba']) ? $_GET['rba'] : '';
@@ -3524,6 +3570,7 @@ class Admin extends AdminModule
               'perubahan' => $_POST['perubahan'],
               'pergeseran' => $_POST['pergeseran'],
               'realisasi' => $_POST['realisasi'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $rba = isset($_GET['rba']) ? $_GET['rba'] : '';
@@ -3573,6 +3620,8 @@ class Admin extends AdminModule
         'perubahan' => $_POST['perubahan'],
         'pergeseran' => $_POST['pergeseran'],
         'realisasi' => $_POST['realisasi'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $rba2026 = isset($_GET['rba2026']) ? $_GET['rba2026'] : '';
@@ -3618,6 +3667,7 @@ class Admin extends AdminModule
               'perubahan' => $_POST['perubahan'],
               'pergeseran' => $_POST['pergeseran'],
               'realisasi' => $_POST['realisasi'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $rba2026 = isset($_GET['rba2026']) ? $_GET['rba2026'] : '';
@@ -3668,6 +3718,8 @@ class Admin extends AdminModule
         'kelompok' => $_POST['kelompok'],
         'kode_kelompok' => $_POST['kode_kelompok'],
         'len' => $_POST['len'],
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s')
       ]);
 
       $akunbelanja = isset($_GET['akunbelanja']) ? $_GET['akunbelanja'] : '';
@@ -3980,8 +4032,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrka = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrka/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrka/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrka/';
+      $pluginWeb = '/uploads/hosplan/usulanrka/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrka)) {
@@ -4037,8 +4089,8 @@ class Admin extends AdminModule
 
       // Bangun URL file lampiran untuk pratinjau pada halaman konfirmasi status
       if ($uploadrka && isset($uploadrka[0])) {
-        $pluginFs = __DIR__ . '/uploads/usulanrka/';
-        $pluginWeb = '/plugins/hosplan/uploads/usulanrka/';
+        $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrka/';
+        $pluginWeb = '/uploads/hosplan/usulanrka/';
         $legacyFs = __DIR__ . '/../../uploads/surat/';
         $legacyWeb = '/uploads/surat/';
         $fn = isset($uploadrka[0]['file_usulan']) ? $uploadrka[0]['file_usulan'] : '';
@@ -4087,6 +4139,7 @@ class Admin extends AdminModule
               'id_usulan' => $id_usulan,
               'id_status_surat' => $_POST['id_status_surat'],
               'keterangan' => $_POST['keterangan'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $surat = isset($_GET['surat']) ? $_GET['surat'] : '';
@@ -4122,8 +4175,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanrba = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanrba/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanrba/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrba/';
+      $pluginWeb = '/uploads/hosplan/usulanrba/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanrba)) {
@@ -4176,8 +4229,8 @@ class Admin extends AdminModule
 
       // Bangun URL file lampiran untuk pratinjau pada halaman konfirmasi status RBA
       if ($uploadrba && isset($uploadrba[0])) {
-        $pluginFs = __DIR__ . '/uploads/usulanrba/';
-        $pluginWeb = '/plugins/hosplan/uploads/usulanrba/';
+        $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanrba/';
+        $pluginWeb = '/uploads/hosplan/usulanrba/';
         $legacyFs = __DIR__ . '/../../uploads/surat/';
         $legacyWeb = '/uploads/surat/';
         $fn = isset($uploadrba[0]['file_usulan']) ? $uploadrba[0]['file_usulan'] : '';
@@ -4225,6 +4278,7 @@ class Admin extends AdminModule
               'id_usulan' => $id_usulan,
               'id_status_surat' => $_POST['id_status_surat'],
               'keterangan' => $_POST['keterangan'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
@@ -4259,8 +4313,8 @@ class Admin extends AdminModule
 
       $tabel_uploadusulanbukbel = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
-      $pluginFs = __DIR__ . '/uploads/usulanbukbel/';
-      $pluginWeb = '/plugins/hosplan/uploads/usulanbukbel/';
+      $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanbukbel/';
+      $pluginWeb = '/uploads/hosplan/usulanbukbel/';
       $legacyFs = __DIR__ . '/../../uploads/surat/';
       $legacyWeb = '/uploads/surat/';
       if (is_array($tabel_uploadusulanbukbel)) {
@@ -4313,8 +4367,8 @@ class Admin extends AdminModule
 
       // Bangun URL file lampiran untuk pratinjau pada halaman konfirmasi status Bukbel
       if ($uploadbukbel && isset($uploadbukbel[0])) {
-        $pluginFs = __DIR__ . '/uploads/usulanbukbel/';
-        $pluginWeb = '/plugins/hosplan/uploads/usulanbukbel/';
+        $pluginFs = __DIR__ . '/../../uploads/hosplan/usulanbukbel/';
+        $pluginWeb = '/uploads/hosplan/usulanbukbel/';
         $legacyFs = __DIR__ . '/../../uploads/surat/';
         $legacyWeb = '/uploads/surat/';
         $fn = isset($uploadbukbel[0]['file_usulan']) ? $uploadbukbel[0]['file_usulan'] : '';
@@ -4361,6 +4415,7 @@ class Admin extends AdminModule
               'id_usulan' => $id_usulan,
               'id_status_surat' => $_POST['id_status_surat'],
               'keterangan' => $_POST['keterangan'],
+              'updated_at' => date('Y-m-d H:i:s')
           ]);
 
       $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
