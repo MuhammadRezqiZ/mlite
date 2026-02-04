@@ -120,7 +120,7 @@
                   </form>
 
                   <!-- Toolbar Aksi (Tambah & Cetak) tampil hanya jika unit sudah dipilih) -->
-                  <form id="formCetakUsulanBukbel" action="{?= url([ADMIN, 'hosplan', 'cetakusulanbukbel']) ?}" method="post">
+                  <form id="formCetakUsulanBukbel" action="{?= url([ADMIN, 'hosplan', 'cetakusulanbukbel']) ?}" method="post" target="_blank">
                     {if: $isUnitSelected}
                       <div class="btn-toolbar" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
                         <a href="{?=url([ADMIN, 'hosplan', 'tambahusulanbukbel'], ['id_rba' => $selectedRBA, 't' => $_GET['t']])?}"

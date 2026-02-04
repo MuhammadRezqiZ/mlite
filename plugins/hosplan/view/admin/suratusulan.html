@@ -60,6 +60,45 @@
     filter:brightness(1.05);
     color:#fff;
   }
+  @media (min-width: 992px) {
+    .modal-xl {
+      width: 90%;
+      max-width: 1200px;
+    }
+  }
+
+  /* Enhanced Table & Text Truncation */
+  .cell-text-limit {
+    max-width: 220px;
+    display: -webkit-box;
+    --webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 2px;
+  }
+  .table-modern thead th {
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    color: white;
+    vertical-align: middle;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 15px;
+  }
+  .table-modern tbody td {
+    vertical-align: top;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .table-modern tbody tr:hover {
+    background-color: #f8faff !important;
+  }
   .btn-icon-action {
     width: 34px;
     height: 34px;
@@ -139,15 +178,15 @@
                   <form id="formCetakUsulanRKA" action="{?= url([ADMIN, 'hosplan', 'cetaksuratusulan']) ?}" method="post">
                     <input type="hidden" name="t" value="{?=$_GET['t']?}">
 
-                    <table id="tabelSuratUsulan" class="table table-striped table-hover" style="width:100%">
+                    <table id="tabelSuratUsulan" class="table table-modern" style="width: 100%; border-collapse: separate; border-spacing: 0">
                         <thead>
                             <tr>
-                                <th style="text-align: center;">Nomor Surat</th>
+                                <th class="text-center" width="5%" style="border-radius: 10px 0 0 10px">Nomor Surat</th>
                                 <th style="text-align: center;">Tanggal Surat</th>
                                 <th style="text-align: center;">Lampiran Surat</th>
                                 <th style="text-align: center;">Perihal Surat</th>
                                 <th style="text-align: center;">Dari Unit</th>
-                                <th style="text-align: center;">Aksi</th>
+                                <th style="text-align: center; border-radius: 0 10px 10px 0">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>

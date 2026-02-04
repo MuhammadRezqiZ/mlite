@@ -1,437 +1,735 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-  /* Style dasar area cetak */
-  .print-area {
-    width: 100%;
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
-    font-size: 12pt;
-    color: #111827;
-  }
-  .print-container { max-width: 1800px; margin: 0 auto; padding: 8px 16px; }
-  .page-title { text-align: center; font-size: 24px; font-weight: 700; margin: 40px 0 24px; color: #0f172a; }
-  .subtitle { font-size: 14px; margin-bottom: 14px; font-weight: 600; color: #374151; }
-  .btn-tombol { justify-content: center; border: 0; border-radius: 8px; padding: 10px 14px; font-size: 14px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
-  .btn-tombol:hover { background: #1f2937; }
-  /* Penyesuaian ukuran tombol-tombol agar seragam dengan tombol kecil */
-  .card.card-default .card-footer .btn-tombol { padding: 8px 12px; }
-  .print-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06); padding: 16px; }
-  /* Modernisasi kartu form dan kontrol */
-  .card.card-default.no-print { border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
-  .card.card-default .card-header { background: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 12px 16px; }
-  .card.card-default .card-title { font-weight: 600; color: #0f172a; margin: 0; }
-  .card.card-default .card-body { padding: 16px; }
-  .card.card-default .card-footer { background: transparent; border-top: 0; padding: 12px 16px; display: flex; justify-content: center; gap: 8px; }
-  .card.card-default .form-group label { font-weight: 600; color: #374151; margin-bottom: 6px; }
-  .card.card-default .form-control { border-radius: 10px; border: 1px solid #d1d5db; padding: 8px 12px; transition: border-color .15s ease, box-shadow .15s ease; }
-  .card.card-default .form-control:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); outline: none; }
-  .callout.callout-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #0f172a; border-radius: 10px; padding: 12px 14px; }
-  .btn-primary.btn-sm { border-radius: 8px; }
-  .rka-table { width: 100%; border-collapse: separate; border-spacing: 1; }
-  .rka-table thead th { background: #f3f4f6; color: #111827; font-weight: 600; border-bottom: 0px solid #e5e7eb; padding: 10px; text-align: center; }
-  .rka-table tbody td { border-top: 0px solid #e5e7eb; padding: 1px; vertical-align: top; }
-  .rka-table th, .rka-table td { padding: 8px 12px !important; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cetak Usulan RBA</title>
+    <!-- Keep Select2 for the input form -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <style>
+      /* Base Styles (Copied from cetaksurattelaahan.html) */
+      body {
+        font-family: "Times New Roman", Times, serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+      }
 
-  .rka-table tbody tr:nth-child(odd) { background: #fafafa; }
-  .text-right { text-align: right; }
-  .text-center { text-align: center; }
-  @media print {
-    /* Kertas A4 portrait: top lebih kecil agar kop naik */
-    @page { size: A4; margin: 0mm 12mm; }
+      /* Print Area Styles */
+      .print-area {
+        width: 210mm; /* A4 width */
+        margin: 0 auto;
+        background: white;
+        padding: 5mm 15mm; /* Standard padding */
+        box-sizing: border-box;
+        font-size: 12pt;
+        line-height: 1.15;
+        color: #000;
+        position: relative;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
 
-    /* Hilangkan margin/padding default di html & body agar kop naik */
-    html, body { margin: 0 !important; padding: 0 !important; }
+      .btn-print {
+        background: #111827;
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        text-decoration: none;
+        display: inline-block;
+      }
+      .btn-print:hover {
+        background: #1f2937;
+      }
 
-    /* Sembunyikan elemen non-print (navbar, footer, dll) */
-    .no-print,
-    .sidebar,
-    .navbar,
-    #navbar-wrapper,
-    nav.navbar,
-    .footer,
-    .main-header,
-    .main-sidebar,
-    .control-sidebar,
-    .brand-link,
-    .content-header,
-    .content-title,
-    .icon-bar,
-    #notify,
-    .dropdown-menu,
-    .main-footer,
-    footer { display: none !important; }
+      /* Print Specific Styles */
+      @media print {
+        @page {
+          size: A4;
+          margin: 5mm 10mm;
+        }
 
-    /* Biarkan area surat tampil normal dan gunakan font serif untuk cetak */
-    .print-area { position: static; width: 100%; font-family: 'Times New Roman', Times, serif; color: #000; }
-    .print-container { max-width: none !important; padding: 0 !important; }
-    .print-card { box-shadow: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 !important; }
+        /* Hide EVERYTHING by default */
+        body * {
+          visibility: hidden;
+        }
 
-    /* Tabel cetak klasik: garis tebal hitam, tanpa zebra */
-    .text-kode { font-size: 14px; color: #000; }
-    .text-uraian { font-size: 14px; color: #000; }
-    .text-pergeseran { font-size: 14px; color: #000; }
-    .permintaan { font-size: 14px; color: #000; }
-    .text-total { font-size: 14px; color: #000; }
-    table.rka-table { width: 900px !important; border-collapse: collapse !important; border: 1px solid #000 !important; margin-top: 20px; }
-    .rka-table thead th { background: #fff !important; color: #000 !important; text-align: center !important; border: 1px solid #000 !important; }
-    .rka-table tbody td { background: #fff !important; color: #000 !important; border: 1px solid #000 !important; }
-    .rka-table tbody tr:nth-child(odd) { background: #fff !important; }
-    /* Beri jarak antara isi dan garis saat cetak */
-    .rka-table th, .rka-table td { padding: 8px 12px !important; }
+        /* Hide known wrapper elements to be safe */
+        .no-print,
+        .sidebar,
+        .navbar,
+        .footer,
+        footer,
+        header,
+        .main-header,
+        .content-header,
+        .input-card {
+          display: none !important;
+        }
 
-    /* Judul lebih besar saat cetak */
-    .page-title { font-size: 28px !important; color: #000 !important; margin: 0 0 12mm !important; }
+        /* Reset Body */
+        body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+        }
 
-    /* Sembunyikan tombol aksi saat cetak */
-    .btn-print { display: none !important; }
-    .subtitle { color: #000 !important; }
+        /* Show and Position Print Area */
+        .print-area,
+        .print-area * {
+          visibility: visible;
+        }
 
-    /* Matikan penambahan URL otomatis di belakang tautan saat print */
-    a[href]:after, abbr[title]:after { content: '' !important; }
-  }
-  </style>
-</head>
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
-<div class="wrapper">
-  <div class="content-wrapper">
-    <section class="content" >
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12 print-container">
-            <div class="callout callout-info no-print" style="margin-bottom: 20px;">
-              <h5><i class="fa fa-info"></i> &nbsp; Catatan :</h5>
-               Pastikan anda telah menginput semua inputan Surat Usulan RBA terlebih dulu sebelum menekan tombol 🖨️ Print/Simpan pdf.
-            </div>
-            <div class="card card-default no-print" style="margin-bottom: 20px;">
-              <div class="card-header">
-                <h3 class="card-title">Input Surat Usulan RBA</h3>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-2">
-                    <div class="form-group">
-                      <label for="tanggal_cetak" style="font-weight: 400;">Tanggal :</label>
-                      <input type="date" id="tanggal_cetak" class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-group">
-                      <label for="nomor_surat">Nomor :</label>
-                      <input type="text" id="nomor_surat" class="form-control" placeholder="Contoh : 001/UNIT/RSUD/2025" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="lampiran_surat">Lampiran :</label>
-                      <input type="text" id="lampiran_surat" class="form-control" placeholder="Masukkan Lampiran surat..." required>
-                    </div> 
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="perihal_surat">Perihal :</label>
-                      <input type="text" id="perihal_surat" class="form-control" placeholder="Masukkan Perihal surat..." required>
-                    </div>
-                    <div class="form-group">
-                      <label for="permasalahan_surat">Permasalahan :</label>
-                      <input type="text" id="permasalahan_surat" class="form-control" placeholder="Masukkan Permasalahan surat...." required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="dasar_surat">Dasar :</label>
-                      <input type="text" id="dasar_surat" class="form-control" placeholder="Masukkan Dasar surat..." required>
-                    </div>
-                    <div class="form-group">
-                      <label for="analisis_surat">Analisis :</label>
-                      <input type="text" id="analisis_surat" class="form-control" placeholder="Masukkan Analisis surat...." required>
-                    </div>
-                  </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label for="pptk_cetak">Dari PPTK :</label>
-                      <select id="pptk_cetak" value="" class="form-control select2">
-                        <option value="">Pilih PPTK</option>
-                        {loop: $pptk}
-                          <option value="{$value.id_pptk}" 
-                                  data-nama="{$value.nama_pptk}"
-                                  data-nip="{$value.nip}"
-                                  >{$value.nama_pptk}
-                          </option>
-                        {/loop}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-12" hidden>
-                    <div class="form-group">
-                      <label for="nip_pegawai">NIP :</label>
-                      <input type="text" id="nip_pegawai" class="form-control" readonly>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <button id="btnTerapkanCetak" class="btn-tombol btn-info btn-sm" style="background: #0743c5; color: #fff;">Terapkan</button>
-                <button class="btn-tombol no-print" onclick="window.print()" style="background: #111827; color: #fff;">🖨️ Print / Simpan PDF</button>
-                <a href="{?=url([ADMIN, 'hosplan', 'usulanrba'])?}" class="btn-tombol btn-secondary no-print" style="background: #dc0404; color: #fff;">Kembali</a>
-              </div>
-            </div>
-            <!-- Main content -->
-            <div class="print-area">
-              <!-- title row -->
-               <div class="row">
-                <div class="col-12">
-                  <div class="kop" style="font-family: 'Times New Roman', Times, serif; text-align: center; border-bottom: 2px solid #000; padding-bottom: 4px; margin-top: 0; margin-bottom: 12px;">
-                    <img src="{?= url('/plugins/hosplan/img/hst.png') ?}" alt="Logo" style="float: left; width: 70px; height: 100px; margin-left: 1px; margin-right: 1px;">
-                        <h4 style="font-size: 22px; margin-top: 1px; margin-bottom: 1px; margin-left: 1px;"><b>PEMERINTAH KABUPATEN HULU SUNGAI TENGAH</b></h4>
-                        <h4 style="font-size: 22px; margin-top: 1px; margin-bottom: 1px;"><b>DINAS KESEHATAN</b></h4>
-                        <h3 style="font-size: 19px; margin-top: 1px; margin-bottom: 1px;"><b>UPT RSUD H. DAMANHURI BARABAI</b></h3>
-                        <p style="font-size: 14px; margin-top: 1px; margin-bottom: 1px;">Jalan Murakata Nomor 4 Barabai Barat Hulu Sungai Tengah Kalimantan Selatan 71314</p>
-                        <p style="font-size: 14px; margin-top: 1px; margin-bottom: 1px;">Telp : 0811 5008080 Laman : www.rshdbarabai.com, Pos-el : rshd@hstkab.go.id</p>
-                  </div>    
-                </div>
-              </div>
-              <div class="row">
-                <div class="col 12">
-                 <div class="judul" style="font-family: 'Times New Roman', Times, serif; text-align: center; font-weight: bold; text-decoration: underline; font-size: 20px; margin-bottom: 20px;">TELAAHAN STAF</div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                  <style>
-                    .meta-grid { display: grid; grid-template-columns: 160px 12px 1fr; column-gap: 6px; row-gap: 8px; margin-bottom: 10px; align-items: start; }
-                    .meta-label { color: #000; }
-                    .meta-sep { color: #000; text-align: center; }
-                    .meta-value { color: #000; font-weight: 400; }
-                    .meta-grid div { line-height: 1.25; }
-                    .meta-divider { grid-column: 1 / -1; height: 2px; background: #000; margin: 6px 0; }
-                    .print-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; background: #fff; }
-                    .rka-table { width: 100%; border-collapse: collapse; }
-                    .rka-table thead th { background: #f5f7fa !important; color: #000 !important; }
-                    .rka-table tbody tr:nth-child(odd) { background: #fff !important; }
-                    .rka-table td.text-pergeseran, .rka-table td.permintaan, .rka-table td.text-total { text-align: right !important; }
-                    .rka-table tbody tr.total-row td { font-weight: 700; background: #f9fafb; }
-                  </style>
-                  <div class="meta-grid subtitle">
-                    <div class="meta-label">Kepada</div><div class="meta-sep">:</div><div class="meta-value">Pemimpin BLUD RSUD H. Damanhuri Barabai</div>
-                    <div class="meta-label">Dari</div><div class="meta-sep">:</div><div class="meta-value">Pejabat Pelaksana Teknis Kegiatan</div>
-                    <div class="meta-label">Tanggal</div><div class="meta-sep">:</div><div class="meta-value"><span id="tanggal_area">-</span></div>
-                    <div class="meta-label">Lampiran</div><div class="meta-sep">:</div><div class="meta-value"><span id="lampiran_area">-</span></div>
-                    <div class="meta-label">Nomor</div><div class="meta-sep">:</div><div class="meta-value"><span id="nomor_area">-</span></div>
-                    <div class="meta-label">Sifat</div><div class="meta-sep">:</div><div class="meta-value">Biasa</div>
-                    <div class="meta-label">Perihal</div><div class="meta-sep">:</div><div class="meta-value"><span id="perihal_area">-</span></div>
-                    <div class="meta-divider"></div>
-                    <div class="meta-label">Dasar</div><div class="meta-sep">:</div><div class="meta-value"><span id="dasar_area">-</span></div>
-                    <div class="meta-label">Permasalahan</div><div class="meta-sep">:</div><div class="meta-value"><span id="permasalahan_area">-</span></div>
-                    <div class="meta-label">Analisis</div><div class="meta-sep">:</div><div class="meta-value"><span id="analisis_area">-</span></div>
-                  </div>
-                  <div class="print-card">
-                    <table class="rka-table">
-                      <thead>
-                        <tr>
-                          <th class="text-kode" style="text-align: center;">Kode Akun</th>
-                          <th class="text-uraian" style="text-align: center;">Uraian</th>
-                          <th class="text-pergeseran" style="text-align: center;">Anggaran Pergeseran</th>
-                          <th class="permintaan" style="text-align: center;">Permintaan Anggaran</th>
-                          <th class="text-total" style="text-align: center;">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {loop: $usulanrba}
-                        <tr>
-                          <td class="text-kode" style="text-align: left;">{$value.kode_akun}</td>
-                          <td class="text-uraian" style="text-align: left;">{$value.uraian_kegiatan}</td>
-                          <td class="text-pergeseran" style="text-align: center;">Rp. {?=number_format($value['pergeseran'], 0, ',', '.')?}</td>
-                          <td class="permintaan" style="text-align: center;">Rp. {?=number_format($value['permintaan_anggaran'], 0, ',', '.')?}</td>
-                          <td class="text-total" style="text-align: center;">Rp. {?=number_format($value['total'], 0, ',', '.')?}</td>
-                        </tr>
-                        {/loop}
-                        <tr class="total-row">
-                          <td colspan="2" style="text-align: center;">Total</td>
-                          <td id="sum-pergeseran" style="text-align: right;">Rp. -</td>
-                          <td id="sum-permintaan" style="text-align: right;">Rp. -</td>
-                          <td id="sum-total" style="text-align: right;">Rp. -</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                    <div class="signature" style="width: 320px; float: right; margin-top: 50px; text-align: center; font-size: 14px;">
-                      <div>Pejabat Pelaksana Teknis Kegiatan</div>
+        .print-area {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+        }
 
-                      
-
-                      <!-- Ruang tanda tangan -->
-                      <div style="height: 40px"></div>
-
-                      <div class="name" style="margin-top: 30px; font-weight: 700;"><span id="pegawai_area" style="text-decoration: underline;">-</span></div>
-                      <div style="font-size: 14px"><span id="nip_area">-</span></div>
-                    </div>
-                    <div class="disposisi" style="margin-top: 200px; margin-bottom: 20px;">
-                        <div style="margin-bottom: 12px;"><b>Disposisi</b></div>
-                        <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
-                            <tr>
-                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 100px; width: 350px;"><b>Kasubag Perencanaan dan Keuangan BLUD</b></td>
-                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 120px;"></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 100px; width: 350px;"><b>Pemimpin BLUD</b></td>
-                                <td style="border: 1px solid black; padding: 10px; vertical-align: top; height: 120px;"></td>
-                            </tr>
-                        </table>
-                    </div>
-
-                </div>
-                <!-- /.col -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-<script>
-  if (window.jQuery && typeof $.fn.select2 === 'function') {
-    $('.select2').select2({
-      placeholder: "Ketik minimal 3 huruf untuk mencari...",
-      width: '100%',
-      language: {
-        inputTooShort: function() {
-          return "Ketik minimal 3 huruf untuk mencari";
-        },
-        noResults: function() {
-          return "Tidak ada hasil ditemukan";
+        /* Remove link href display */
+        a[href]:after,
+        abbr[title]:after {
+          content: "" !important;
         }
       }
-    });
-  }
-  const checkAllEl = document.getElementById('checkAll');
-  if (checkAllEl) {
-    checkAllEl.addEventListener('change', function() {
-      document.querySelectorAll('input[name="id_usulan[]"]').forEach(cb => cb.checked = this.checked);
-    });
-  }
-  // Hitung total kolom tabel berdasarkan baris yang tampil
-  function updateTableTotals() {
-    const rows = document.querySelectorAll('.rka-table tbody tr');
-    let sumPergeseran = 0;
-    let sumPermintaan = 0;
-    let sumTotal = 0;
 
-    const toNumber = (txt) => {
-      if (!txt) return 0;
-      const clean = String(txt).replace(/[^0-9]/g, '');
-      const n = parseInt(clean, 10);
-      return isNaN(n) ? 0 : n;
-    };
-
-    rows.forEach((row) => {
-      const pergeseranCell = row.querySelector('td.text-pergeseran');
-      const permintaanCell = row.querySelector('td.permintaan');
-      const totalCell = row.querySelector('td.text-total');
-      // Abaikan baris total karena tidak memiliki class di atas
-      if (pergeseranCell && permintaanCell && totalCell) {
-        sumPergeseran += toNumber(pergeseranCell.textContent);
-        sumPermintaan += toNumber(permintaanCell.textContent);
-        sumTotal += toNumber(totalCell.textContent);
+      /* Compact Layout Helpers */
+      .kop {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 2px;
+        margin-bottom: 5px;
+        position: relative;
+        min-height: 80px; /* Ensure height for absolute logo */
       }
-    });
+      .kop h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .kop h4 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .kop p {
+        margin: 0;
+        font-size: 12px;
+      }
 
-    const formatIdr = (n) => 'Rp. ' + n.toLocaleString('id-ID');
-    const pergeseranSumEl = document.getElementById('sum-pergeseran');
-    const permintaanSumEl = document.getElementById('sum-permintaan');
-    const totalSumEl = document.getElementById('sum-total');
-    if (pergeseranSumEl) pergeseranSumEl.textContent = formatIdr(sumPergeseran);
-    if (permintaanSumEl) permintaanSumEl.textContent = formatIdr(sumPermintaan);
-    if (totalSumEl) totalSumEl.textContent = formatIdr(sumTotal);
-  }
+      .meta-table {
+        width: 100%;
+        margin-bottom: 5px;
+        border-collapse: collapse;
+      }
+      .meta-table td {
+        vertical-align: top;
+        padding: 0 2px;
+      }
+      .meta-label {
+        width: 90px;
+        font-size: 11pt;
+      }
+      .meta-sep {
+        width: 10px;
+        text-align: center;
+      }
 
-  document.addEventListener('DOMContentLoaded', updateTableTotals);
-  document.getElementById('btnTerapkanCetak').addEventListener('click', function() {
-    const tanggalInput = document.getElementById('tanggal_cetak').value;
-    const pptkSelect = document.getElementById('pptk_cetak');
-    const selectedOption = (pptkSelect && pptkSelect.selectedIndex >= 0)
-      ? pptkSelect.options[pptkSelect.selectedIndex]
-      : null;
-    const namaPptk = selectedOption ? (selectedOption.getAttribute('data-nama') || selectedOption.textContent || '') : '';
-    const nipPptk = selectedOption ? (selectedOption.getAttribute('data-nip') || '') : '';
-    const lampiran = (document.getElementById('lampiran_surat').value || '').trim();
-    const perihal = (document.getElementById('perihal_surat').value || '').trim();
-    const nomor = (document.getElementById('nomor_surat').value || '').trim();
-    const dasar = (document.getElementById('dasar_surat').value || '').trim();
-    const permasalahan = (document.getElementById('permasalahan_surat').value || '').trim();
-    const analisis = (document.getElementById('analisis_surat').value || '').trim();
+      .section-row {
+        margin-top: 5px;
+      }
+      .section-num {
+        width: 30px;
+        float: left;
+        font-weight: bold;
+        text-align: right;
+        padding-right: 10px;
+      }
+      .section-content {
+        margin-left: 40px;
+        text-align: justify;
+      }
+      .section-title {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 11pt;
+        margin-bottom: 1px;
+      }
+      .section-content p {
+        margin: 0;
+      }
 
-    if (tanggalInput) {
-      const tanggalBaru = new Date(tanggalInput);
-      const options = { day: 'numeric', month: 'long', year: 'numeric' };
-      let formatTanggal = tanggalBaru.toLocaleDateString('id-ID', options);
-      formatTanggal = formatTanggal.replace(/(\s[a-z])/, function(m) { return m.toUpperCase(); });
+      .disposisi-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .disposisi-table th,
+      .disposisi-table td {
+        border: 1px solid #000;
+        padding: 2px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 12pt;
+      }
+      .disposisi-box {
+        height: 60px;
+      }
 
-      // Tampilkan tanggal saja pada span; teks "Barabai," sudah ada di markup
-      const tanggalAreaEl = document.getElementById('tanggal_area');
-      if (tanggalAreaEl) tanggalAreaEl.innerText = formatTanggal;
-    }
-    // Update teks dari inputan
-    const lampiranAreaEl = document.getElementById('lampiran_area');
-    if (lampiranAreaEl) lampiranAreaEl.innerText = lampiran || '-';
-    const perihalAreaEl = document.getElementById('perihal_area');
-    if (perihalAreaEl) perihalAreaEl.innerText = perihal || '-';
-    const nomorAreaEl = document.getElementById('nomor_area');
-    if (nomorAreaEl) nomorAreaEl.innerText = nomor || '-';
-    const dasarAreaEl = document.getElementById('dasar_area');
-    if (dasarAreaEl) dasarAreaEl.innerText = dasar || '-';
-    const permasalahanAreaEl = document.getElementById('permasalahan_area');
-    if (permasalahanAreaEl) permasalahanAreaEl.innerText = permasalahan || '-';
-    const analisisAreaEl = document.getElementById('analisis_area');
-    if (analisisAreaEl) analisisAreaEl.innerText = analisis || '-';
+      /* RBA Table Specifics (Custom for this file) */
+      .rka-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #000;
+        margin-top: 10px;
+        font-size: 11pt;
+      }
+      .rka-table th, .rka-table td {
+        border: 1px solid #000;
+        padding: 4px;
+      }
+      .rka-table th {
+        text-align: center;
+        font-weight: bold;
+        background-color: #f0f0f0; /* Light gray header for readability */
+      }
+      .text-right { text-align: right; }
+      .text-center { text-align: center; }
 
-    // Update identitas PPTK pada area tanda tangan
-    const pegawaiAreaEl = document.getElementById('pegawai_area');
-    if (pegawaiAreaEl) pegawaiAreaEl.innerText = namaPptk || '-';
-    const nipAreaEl = document.getElementById('nip_area');
-    if (nipAreaEl) nipAreaEl.innerText = nipPptk ? `NIP. ${nipPptk}` : '-';
-  });
+      /* Modal Styles */
+      .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .custom-modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .close-modal {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        padding-left: 10px;
+      }
+      .ttd-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .ttd-item {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .ttd-item:hover {
+        transform: scale(1.05);
+        border-color: #007bff;
+      }
+      .ttd-item img {
+        max-width: 150px;
+        max-height: 100px;
+        display: block;
+        margin: 0 auto;
+      }
 
-  // Autofill nama dan NIP saat unit dipilih
-  const pptkCetakEl = document.getElementById('pptk_cetak');
-  if (pptkCetakEl) {
-    function fillFromSelectedOption(sel) {
-      if (!sel) return;
-      const nama = sel.getAttribute('data-nama') || sel.textContent || '';
-      const nip = sel.getAttribute('data-nip') || '';
-      // Simpan ke input tersembunyi bila diperlukan
-      const nipInputEl = document.getElementById('nip_pegawai');
-      if (nipInputEl) nipInputEl.value = nip;
-      // Perbarui area tanda tangan
-      const pegawaiEl = document.getElementById('pegawai_area');
-      if (pegawaiEl) pegawaiEl.innerText = nama || '-';
-      const nipEl = document.getElementById('nip_area');
-      if (nipEl) nipEl.innerText = nip ? `NIP. ${nip}` : '-';
-    }
+      /* Input Card Style (Only for screen) */
+      .input-card {
+        max-width: 100%;
+        margin: 20px 20px 20px 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        font-family: sans-serif; /* Use sans-serif for form */
+      }
+      .form-group { margin-bottom: 1rem; }
+      .form-group label { display: block; margin-bottom: .5rem; font-weight: bold; font-size: 14px; }
+      .form-control { 
+        width: 100%; 
+        padding: .375rem .75rem; 
+        font-size: 1rem; 
+        line-height: 1.5; 
+        color: #495057; 
+        background-color: #fff; 
+        background-clip: padding-box; 
+        border: 1px solid #ced4da; 
+        border-radius: .25rem; 
+        box-sizing: border-box; 
+      }
+      .row { display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px; }
+      .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-12 { position: relative; width: 100%; padding-right: 15px; padding-left: 15px; box-sizing: border-box; }
+      @media (min-width: 768px) {
+        .col-md-2 { flex: 0 0 16.666667%; max-width: 16.666667%; }
+        .col-md-3 { flex: 0 0 25%; max-width: 25%; }
+        .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
+        .col-md-5 { flex: 0 0 41.666667%; max-width: 41.666667%; }
+        .col-md-6 { flex: 0 0 50%; max-width: 50%; }
+        .col-md-12 { flex: 0 0 100%; max-width: 100%; }
+      }
+      
+      /* Alert Style */
+      .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+      }
+      .alert-info {
+        color: #31708f;
+        background-color: #eef9fd;
+        border-color: #bce8f1;
+        border-left: 4px solid #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <!-- Input Form (Hidden on Print) -->
+    <div class="input-card no-print">
+      <div class="alert alert-info">
+        <strong><i class="fa fa-info-circle"></i> Catatan :</strong>
+        Pastikan anda telah menginput semua inputan Surat Usulan RBA terlebih dulu sebelum menekan tombol <strong>🖨️ Print / Simpan PDF</strong>.
+      </div>
 
-    pptkCetakEl.addEventListener('change', function() {
-      const selected = this.options[this.selectedIndex];
-      fillFromSelectedOption(selected);
-    });
+      <h3 style="margin-top:0; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Input Surat Usulan RBA</h3>
+      
+      <div class="row">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="tanggal_cetak">Tanggal :</label>
+              <input type="date" id="tanggal_cetak" class="form-control">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="nomor_surat">Nomor :</label>
+              <input type="text" id="nomor_surat" class="form-control" placeholder="Contoh : 001/UNIT/RSUD/2025" required>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="form-group">
+              <label for="lampiran_surat">Lampiran :</label>
+              <input type="text" id="lampiran_surat" class="form-control" placeholder="Masukkan Lampiran surat..." required>
+            </div> 
+          </div>
 
-    // Jika Select2 aktif, pastikan event spesifiknya juga memicu autofill
-    if (window.jQuery && typeof $.fn.select2 === 'function') {
-      $('#pptk_cetak').on('select2:select', function(e) {
-        const idx = pptkCetakEl.selectedIndex;
-        const selected = pptkCetakEl.options[idx];
-        fillFromSelectedOption(selected);
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="perihal_surat">Perihal :</label>
+              <input type="text" id="perihal_surat" class="form-control" placeholder="Masukkan Perihal surat..." required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="unit_kerja_surat">Unit Kerja :</label>
+              <input type="text" id="unit_kerja_surat" class="form-control" placeholder="Contoh: Unit Hemodialisa">
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="permasalahan_surat">Permasalahan :</label>
+              <input type="text" id="permasalahan_surat" class="form-control" placeholder="Masukkan Permasalahan surat...." required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="pra_anggapan_surat">Pra Anggapan :</label>
+              <input type="text" id="pra_anggapan_surat" class="form-control" placeholder="Masukkan Pra Anggapan..." value="-">
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="analisis_surat">Analisis (Pembahasan) :</label>
+              <input type="text" id="analisis_surat" class="form-control" placeholder="Masukkan Analisis surat...." required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="saran_tindak_surat">Saran Tindak :</label>
+              <textarea id="saran_tindak_surat" class="form-control" rows="1">Melakukan evaluasi dan peningkatan kapasitas server serta jaringan. Menerapkan sistem monitoring.</textarea>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="penutup_surat">Penutup :</label>
+              <input type="text" id="penutup_surat" class="form-control" value="Demikian disampaikan, mohon arahan dan persetujuan.">
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="pptk_cetak">Dari PPTK :</label>
+              <select id="pptk_cetak" class="form-control select2">
+                <option value="">Pilih PPTK</option>
+                {loop: $pptk}
+                  <option value="{$value.id_pptk}" 
+                          data-nama="{$value.nama_pptk}"
+                          data-nip="{$value.nip}"
+                          >{$value.nama_pptk}
+                  </option>
+                {/loop}
+              </select>
+            </div>
+          </div>
+          <div class="col-md-12" hidden>
+            <div class="form-group">
+              <label for="nip_pegawai">NIP :</label>
+              <input type="text" id="nip_pegawai" class="form-control" readonly>
+            </div>
+          </div>
+      </div>
+
+      <div style="margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+        <button id="btnTerapkanCetak" class="btn-print" style="background-color: #0743c5; margin-right: 5px;">Terapkan</button>
+        <button class="btn-print" onclick="window.print()" style="background-color: #111827; margin-right: 5px;">🖨️ Print / Simpan PDF</button>
+        <button class="btn-print" id="btn-sign" style="background-color: #28a745; margin-right: 5px;" >✍️ TTD-Elektronik</button>
+        <a href="{?=url([ADMIN, 'hosplan', 'usulanrba'])?}" class="btn-print" style="background: #dc0404;">Kembali</a>
+      </div>
+    </div>
+
+    <div class="print-area">
+      <!-- KOP -->
+      <div class="kop" style="margin-top: 10px;">
+        <img src="{?= url('/plugins/hosplan/img/hst.png') ?}" alt="Logo" style="position: absolute; left: 0; top: 0; width: 50px; height: 70px;" />
+        <h4><b>PEMERINTAH KABUPATEN HULU SUNGAI TENGAH</b></h4>
+        <h4><b>DINAS KESEHATAN</b></h4>
+        <h3><b>UPT RSUD H. DAMANHURI BARABAI</b></h3>
+        <p>Jalan Murakata Nomor 4 Barabai Barat Hulu Sungai Tengah Kalimantan Selatan 71314</p>
+        <p>Telp : 0811 5008080 Laman : www.rshdbarabai.com, Pos-el : rshd@hstkab.go.id</p>
+      </div>
+
+      <!-- TITLE -->
+      <div style="text-align: center;margin-top: 10px; margin-bottom: 10px">
+        <h4 style="text-decoration: underline;font-weight: bold;margin: 0;font-size: 14pt;">TELAAHAN STAF</h4>
+      </div>
+
+      <!-- METADATA -->
+      <table class="meta-table">
+        <tr>
+          <td class="meta-label">Kepada Yth</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;">Direktur/Pemimpin BLUD RSUD H. Damanhuri Barabai</td>
+        </tr>
+        <tr>
+          <td class="meta-label">Dari</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;">Pejabat Pelaksana Teknis Kegiatan <span id="dari_unit_area"></span> RSUD H. Damanhuri Barabai</td>
+        </tr>
+        <tr>
+          <td class="meta-label">Nomor</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;"><span id="nomor_area">-</span></td>
+        </tr>
+        <tr>
+          <td class="meta-label">Tanggal</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;"><span id="tanggal_area">-</span></td>
+        </tr>
+        <tr>
+          <td class="meta-label">Lampiran</td>
+          <td class="meta-sep">:</td>
+          <td style="font-size: 11pt;"><span id="lampiran_area">-</span></td>
+        </tr>
+        <tr>
+          <td class="meta-label">Perihal</td>
+          <td class="meta-sep">:</td>
+          <td style="font-weight: bold; font-style: italic; font-size: 11pt;"><span id="perihal_area">-</span></td>
+        </tr>
+        <tr>
+          <td colspan="3" style="border-bottom: 2px solid #000; height: 5px"></td>
+        </tr>
+      </table>
+
+      <!-- CONTENT SECTIONS -->
+      <div class="section-row">
+        <div class="section-num">I.</div>
+        <div class="section-content">
+          <div class="section-title">PERMASALAHAN</div>
+          <p><span id="permasalahan_area">-</span></p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">II.</div>
+        <div class="section-content">
+          <div class="section-title">PRA ANGGAPAN</div>
+          <p><span id="pra_anggapan_area">-</span></p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">III.</div>
+        <div class="section-content">
+          <div class="section-title">FAKTA-FAKTA</div>
+           <table class="rka-table">
+              <thead>
+                <tr>
+                  <th class="text-kode">Kode Akun</th>
+                  <th class="text-uraian">Uraian</th>
+                  <th class="text-pergeseran">Anggaran Pergeseran</th>
+                  <th class="permintaan">Permintaan Anggaran</th>
+                  <th class="text-total">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loop: $usulanrba}
+                <tr>
+                  <td class="text-kode" style="text-align: left;">{$value.kode_akun}</td>
+                  <td class="text-uraian" style="text-align: left;">{$value.uraian_kegiatan}</td>
+                  <td class="text-pergeseran text-right">Rp. {?=number_format($value['pergeseran'], 0, ',', '.')?}</td>
+                  <td class="permintaan text-right">Rp. {?=number_format($value['permintaan_anggaran'], 0, ',', '.')?}</td>
+                  <td class="text-total text-right">Rp. {?=number_format($value['total'], 0, ',', '.')?}</td>
+                </tr>
+                {/loop}
+                <tr class="total-row" style="font-weight: bold; background: #f9fafb;">
+                  <td colspan="2" style="text-align: center;">Total</td>
+                  <td id="sum-pergeseran" class="text-right">Rp. -</td>
+                  <td id="sum-permintaan" class="text-right">Rp. -</td>
+                  <td id="sum-total" class="text-right">Rp. -</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">IV.</div>
+        <div class="section-content">
+          <div class="section-title">PEMBAHASAN</div>
+          <p><span id="analisis_area">-</span></p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">V.</div>
+        <div class="section-content">
+          <div class="section-title">SARAN TINDAK</div>
+          <p><span id="saran_tindak_area">Melakukan evaluasi dan peningkatan kapasitas server serta jaringan. Menerapkan sistem monitoring.</span></p>
+        </div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-num">VI.</div>
+        <div class="section-content">
+          <div class="section-title">PENUTUP</div>
+          <p><span id="penutup_area">Demikian disampaikan, mohon arahan dan persetujuan.</span></p>
+        </div>
+      </div>
+
+      <!-- CLOSING (Hardcoded to match surattelaahan) -->
+      <div style="margin-left: 40px; margin-top: 5px">
+        Demikian disampaikan, mohon arahan dan persetujuan.
+      </div>
+
+      <!-- SIGNATURE -->
+      <div style="width: 100%; overflow: hidden; margin-top: 10px">
+        <div class="ttd" style="float: right; text-align: center; width: 280px">
+          <div style="font-size: 15px">Pejabat Pelaksana Teknis Kegiatan BLUD,<br /><span id="sign_unit_area"></span><br />RSUD H. Damanhuri Barabai</div>
+          <div id="qr-code-container" style=" display: flex; justify-content: center; align-items: center; min-height: 50px; margin: 0; padding: 0;">
+            <span id="qr-placeholder"></span>
+          </div>
+          <p style="font-weight: bold; text-decoration: underline; margin: 0; font-size: 14px;">
+            <span id="pegawai_area">-</span>
+          </p>
+          <p style="margin-top: 0; font-size: 14px;"><span id="nip_area">-</span></p>
+        </div>
+      </div>
+
+      <!-- DISPOSISI -->
+      <div style="margin-top: 5px">
+        <div style="font-weight: bold; font-size: 11pt">Disposisi:</div>
+        <table class="disposisi-table">
+          <tr>
+            <th width="35%" style="font-size: 11pt;">Pejabat Keuangan</th>
+            <td class="disposisi-box"></td>
+          </tr>
+          <tr>
+            <th width="35%" style="font-size: 11pt;">Direktur/Pemimpin BLUD/ Kuasa Pengguna Anggaran</th>
+            <td class="disposisi-box"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- Modal Structure -->
+    <div id="ttdModal" class="custom-modal no-print">
+      <div class="custom-modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Pilih Tanda Tangan</h3>
+        <div class="ttd-grid">
+          {loop: $ttd_files}
+          <div
+            class="ttd-item"
+            data-src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}"
+          >
+            <img
+              src="{?= url('plugins/hosplan/img/ttd/'.$value) ?}"
+              alt="{$value}"
+            />
+            <p style="margin-top: 5px; font-size: 12px">{$value}</p>
+          </div>
+          {/loop}
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Existing JS Logic for Select2
+      if (window.jQuery && typeof $.fn.select2 === 'function') {
+        $('.select2').select2({
+          placeholder: "Ketik minimal 3 huruf untuk mencari...",
+          width: '100%'
+        });
+
+        // Select2 event for auto update
+        $('#pptk_cetak').on('select2:select', function(e) {
+          const data = e.params.data;
+          const nama = $(data.element).data('nama');
+          const nip = $(data.element).data('nip');
+          
+          document.getElementById('pegawai_area').innerText = nama || '-';
+          document.getElementById('nip_area').innerText = nip ? `NIP. ${nip}` : '-';
+          document.getElementById('nip_pegawai').value = nip || '';
+        });
+      }
+
+      function updateTableTotals() {
+        const rows = document.querySelectorAll('.rka-table tbody tr');
+        let sumPergeseran = 0;
+        let sumPermintaan = 0;
+        let sumTotal = 0;
+
+        const toNumber = (txt) => {
+          if (!txt) return 0;
+          const clean = String(txt).replace(/[^0-9]/g, '');
+          const n = parseInt(clean, 10);
+          return isNaN(n) ? 0 : n;
+        };
+
+        const formatRp = (num) => {
+          return 'Rp. ' + num.toLocaleString('id-ID');
+        };
+
+        rows.forEach(row => {
+          if (row.classList.contains('total-row')) return;
+          const pergeseran = toNumber(row.querySelector('.text-pergeseran').innerText);
+          const permintaan = toNumber(row.querySelector('.permintaan').innerText);
+          const total = toNumber(row.querySelector('.text-total').innerText);
+          
+          sumPergeseran += pergeseran;
+          sumPermintaan += permintaan;
+          sumTotal += total;
+        });
+
+        document.getElementById('sum-pergeseran').innerText = formatRp(sumPergeseran);
+        document.getElementById('sum-permintaan').innerText = formatRp(sumPermintaan);
+        document.getElementById('sum-total').innerText = formatRp(sumTotal);
+      }
+
+      // Initial calculation
+      updateTableTotals();
+
+      // Button Logic
+      document.getElementById('btnTerapkanCetak').addEventListener('click', function() {
+        const tanggal = document.getElementById('tanggal_cetak').value;
+        const nomor = document.getElementById('nomor_surat').value;
+        const lampiran = document.getElementById('lampiran_surat').value;
+        const perihal = document.getElementById('perihal_surat').value;
+        const permasalahan = document.getElementById('permasalahan_surat').value;
+        const praAnggapan = document.getElementById('pra_anggapan_surat').value;
+        const analisis = document.getElementById('analisis_surat').value;
+        const saranTindak = document.getElementById('saran_tindak_surat').value;
+        const penutup = document.getElementById('penutup_surat').value;
+        const unitKerja = document.getElementById('unit_kerja_surat').value;
+
+        // Helper to format date
+        const formatDate = (dateString) => {
+          if (!dateString) return '-';
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          return new Date(dateString).toLocaleDateString('id-ID', options);
+        };
+
+        document.getElementById('tanggal_area').innerText = formatDate(tanggal);
+        document.getElementById('nomor_area').innerText = nomor || '-';
+        document.getElementById('lampiran_area').innerText = lampiran || '-';
+        document.getElementById('perihal_area').innerText = perihal || '-';
+        document.getElementById('permasalahan_area').innerText = permasalahan || '-';
+        document.getElementById('pra_anggapan_area').innerText = praAnggapan || '-';
+        document.getElementById('analisis_area').innerText = analisis || '-';
+        document.getElementById('saran_tindak_area').innerText = saranTindak || '-';
+        document.getElementById('penutup_area').innerText = penutup || '-';
+        document.getElementById('dari_unit_area').innerText = unitKerja || '';
+        document.getElementById('sign_unit_area').innerText = unitKerja || '';
+        
+        // Also trigger total update
+        updateTableTotals();
+        
+        alert('Data berhasil diterapkan ke tampilan cetak!');
       });
-      $('#pptk_cetak').on('select2:clear', function() {
-        document.getElementById('nip_pegawai').value = '';
-        document.getElementById('pegawai_area').innerText = '-';
-        document.getElementById('nip_area').innerText = '-';
-        document.getElementById('unit_area2').innerText = '-';
+
+      // TTD Logic
+      $(document).ready(function () {
+        var modal = $("#ttdModal");
+        var span = $(".close-modal");
+
+        $("#btn-sign").on("click", function () {
+          modal.show();
+        });
+
+        span.on("click", function () {
+          modal.hide();
+        });
+
+        $(window).on("click", function (event) {
+          if ($(event.target).is(modal)) {
+            modal.hide();
+          }
+        });
+
+        $(".ttd-item").on("click", function () {
+          var src = $(this).data("src");
+          if (!confirm("Gunakan tanda tangan ini?")) return;
+
+          $("#qr-placeholder").hide();
+          $("#qr-code-container").html(
+            '<img src="' + src + '" style="height: 70px; width: auto;">',
+          );
+
+          modal.hide();
+          $("#btn-sign").hide();
+        });
       });
-    }
-  }
-</script>
-</body>
+    </script>
+  </body>
 </html>

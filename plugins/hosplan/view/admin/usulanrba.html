@@ -120,7 +120,7 @@
                   </form>
 
                   <!-- Toolbar Aksi (Tambah & Cetak) tampil hanya jika filter bukan "Semua PPTK" -->
-                  <form id="formCetakUsulanRBA" action="{?= url([ADMIN, 'hosplan', 'cetakusulanrba']) ?}" method="post">
+                  <form id="formCetakUsulanRBA" action="{?= url([ADMIN, 'hosplan', 'cetakusulanrba']) ?}" method="post" target="_blank">
                     {if: $selectedPptk != 'all'}
                       <div class="btn-toolbar" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
                         <a href="{?=url([ADMIN, 'hosplan', 'tambahusulanrba'])?}"

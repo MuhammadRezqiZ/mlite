@@ -64,20 +64,20 @@
 
 <div class="col-lg-3 col-md-6" style="margin-bottom: 40px;">
         <div class="modern-stat-card rebel">
-            <div class="panel-heading">
+            <div style="margin-bottom: 15px;">
                 <div class="row">
                     <div class="col-xs-3">
-                        <i class="fa fa-archive fa-5x"></i>
+                        <i class="fa fa-archive fa-5x" style="opacity: 0.8;"></i>
                     </div>
-                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 20px">
-                        <div class="huge" id="kas-masuk">0</div>
-                        <div>Jumlah Rebel</div>
+                    <div class="col-xs-9 text-right" style="font-size: 16px; margin-top: 10px; color: white;">
+                        <div class="huge" id="kas-masuk" style="font-size: 3rem; font-weight: 700; line-height: 1;">0</div>
+                        <div style="opacity: 0.9;">Jumlah Rebel</div>
                     </div>
                 </div>
             </div>
-            <div class="">
-                <span class="pull-left">Total Rebel Terkini</span>
-                <span class="pull-right"><i class="fa fa-archive"></i></span>
+            <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; margin-top: 10px;">
+                <span class="pull-left" style="font-size: 0.9rem; opacity: 0.9;">Total Rebel Terkini</span>
+                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                 <div class="clearfix"></div>
             </div>
         </div>
@@ -108,7 +108,7 @@
                                 <th style="text-align: center;">Oktober</th>
                                 <th style="text-align: center;">November</th>
                                 <th style="text-align: center;">Desember</th>
-                                <th style="text-align: center;">Aksi</th>
+                                <th style="text-align: center;">Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -117,20 +117,25 @@
                             <tr>
                                 <td>{$value.kode_akun}</td>
                                 <td>{$value.uraian_kegiatan}</td>
-                                <td>{?=number_format($value['januari'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['februari'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['maret'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['april'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['mei'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['juni'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['juli'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['agustus'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['september'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['oktober'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['november'], 0, ',', '.')?}</td>
-                                <td>{?=number_format($value['desember'], 0, ',', '.')?}</td>
-                                <td class="text-center">
-                                    <a href="{?=url([ADMIN, 'hosplan', 'editrebel', $value['id_rebel']])?}" class="btn btn-success btn-sm"><i class="fa fa-edit"></i> Input</a>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="januari" value="{?=number_format($value['januari'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="februari" value="{?=number_format($value['februari'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="maret" value="{?=number_format($value['maret'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="april" value="{?=number_format($value['april'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="mei" value="{?=number_format($value['mei'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="juni" value="{?=number_format($value['juni'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="juli" value="{?=number_format($value['juli'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="agustus" value="{?=number_format($value['agustus'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="september" value="{?=number_format($value['september'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="oktober" value="{?=number_format($value['oktober'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="november" value="{?=number_format($value['november'], 0, ',', '.')?}"></td>
+                                <td><input type="text" class="rebel-input" data-id="{$value.id_rebel}" data-field="desember" value="{?=number_format($value['desember'], 0, ',', '.')?}"></td>
+                                <td class="total-cell" style="text-align:right;">
+                                    {?= number_format(
+                                        $value['januari'] + $value['februari'] + $value['maret'] + 
+                                        $value['april'] + $value['mei'] + $value['juni'] + 
+                                        $value['juli'] + $value['agustus'] + $value['september'] + 
+                                        $value['oktober'] + $value['november'] + $value['desember']
+                                    , 0, ',', '.') ?}
                                 </td>
                             </tr>
                             {/loop}
@@ -254,7 +259,141 @@ $(document).ready(function() {
           }
         }
     });
-});
+
+  // Utility to parse formatted number
+  function parseLocaleNumber(stringNumber) {
+    if (!stringNumber) return 0;
+    // Remove dots (thousands separator) and replace comma with dot if decimal (though here it seems to be integer)
+    var cleaned = stringNumber.toString().replace(/\./g, ''); 
+    return parseFloat(cleaned) || 0;
+  }
+
+  // Utility to format number
+  function formatLocaleNumber(number) {
+    return new Intl.NumberFormat('id-ID').format(number);
+  }
+
+  // Function to update row total
+  function updateRowTotal(row) {
+    var total = 0;
+    row.find('.rebel-input').each(function() {
+        total += parseLocaleNumber($(this).val());
+    });
+    row.find('.total-cell').text(formatLocaleNumber(total));
+  }
+
+  // Excel-like editing
+  $('#tabelSuratUsulan').on('focus', '.rebel-input', function() {
+    $(this).parent().css('background-color', '#fff');
+    $(this).select(); // Auto select content on focus
+  });
+
+  $('#tabelSuratUsulan').on('input', '.rebel-input', function() {
+     // Recalculate total on input change
+     var row = $(this).closest('tr');
+     updateRowTotal(row);
+  });
+
+  $('#tabelSuratUsulan').on('blur', '.rebel-input', function() {
+    $(this).parent().css('background-color', 'transparent');
+    
+    var input = $(this);
+    var id = input.data('id');
+    var field = input.data('field');
+    var value = input.val();
+    var originalValue = input.prop('defaultValue');
+
+    // Only save if changed
+    if (value !== originalValue) {
+        // Show saving state (e.g. text color blue)
+        input.css('color', 'blue');
+
+        // Format the input value for display
+        var numericValue = parseLocaleNumber(value);
+        var formattedValue = formatLocaleNumber(numericValue);
+        // Only update input value if it's a valid number
+        if (!isNaN(numericValue)) {
+            input.val(formattedValue);
+            // Update value variable for AJAX (though backend cleans it anyway, sending formatted is fine)
+            value = formattedValue; 
+        }
+
+        $.post("{?=url([ADMIN, 'hosplan', 'ajaxupdaterebel'])?}", {
+            id: id,
+            field: field,
+            value: value
+        }, function(response) {
+            try {
+                var res = JSON.parse(response);
+                if(res.status === 'success') {
+                    input.css('color', 'green'); 
+                    input.prop('defaultValue', value); // Update default value
+                    setTimeout(function(){ input.css('color', ''); }, 1000);
+                    showNotification('success', 'Data tersimpan');
+                    // Ensure total is correct after formatting (should be same, but good measure)
+                    updateRowTotal(input.closest('tr'));
+                } else {
+                    input.css('color', 'red');
+                    showNotification('error', 'Gagal: ' + res.message);
+                }
+            } catch(e) {
+                input.css('color', 'red');
+                console.error('Invalid response', response);
+            }
+        }).fail(function() {
+            input.css('color', 'red');
+            showNotification('error', 'Koneksi gagal');
+        });
+    } else {
+        // If not changed but just blurred, maybe reformat ensuring it's consistent
+        var numericValue = parseLocaleNumber(value);
+        if (!isNaN(numericValue)) {
+             input.val(formatLocaleNumber(numericValue));
+        }
+    }
+  });
+
+  // Enter key to save (trigger blur)
+   $('#tabelSuratUsulan').on('keypress', '.rebel-input', function(e) {
+     if(e.which == 13) {
+         $(this).blur();
+         return false; 
+     }
+   });
+
+   // Arrow key navigation
+   $('#tabelSuratUsulan').on('keydown', '.rebel-input', function(e) {
+     var td = $(this).parent();
+     var tr = td.parent();
+     var index = td.index();
+     
+     if (e.which == 37) { // Left
+         var prev = td.prev().find('.rebel-input');
+         if(prev.length) {
+            e.preventDefault();
+            prev.focus();
+         }
+     } else if (e.which == 38) { // Up
+         var prevRow = tr.prev();
+         if(prevRow.length) {
+            e.preventDefault();
+            prevRow.find('td').eq(index).find('.rebel-input').focus();
+         }
+     } else if (e.which == 39) { // Right
+         var next = td.next().find('.rebel-input');
+         if(next.length) {
+            e.preventDefault();
+            next.focus();
+         }
+     } else if (e.which == 40) { // Down
+         var nextRow = tr.next();
+         if(nextRow.length) {
+            e.preventDefault();
+            nextRow.find('td').eq(index).find('.rebel-input').focus();
+         }
+     }
+   });
+ });
 
 </script>
 

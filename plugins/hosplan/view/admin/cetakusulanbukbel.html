@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cetak Usulan Bukbel</title>
+  <link href="{?=url('assets/css/mlite.min.css')?}" rel="stylesheet">
+  <link href="{?=url('assets/css/animate.min.css')?}" rel="stylesheet">
+  <link href="{?=url('themes/admin/css/style.css')?}" rel="stylesheet">
+  <link href="{?=url('assets/css/font-awesome.css')?}" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -62,6 +67,11 @@
   /* Penomoran otomatis kolom No */
   .rka-table tbody { counter-reset: rownum; }
   .rka-table td.row-number::before { counter-increment: rownum; content: counter(rownum); }
+
+  /* Reset margin content wrapper agar full screen */
+  .content-wrapper, .container-fluid, .content { margin-left: 0 !important; margin-top: 0 !important; padding-top: 0 !important; background: white !important; }
+  .wrapper { background: white !important; }
+
   @media print {
     /* Kertas A4 portrait dengan margin nyaman */
     @page { size: A4 landscape; margin-left: 10mm; margin-right: 10mm; margin-bottom: 10mm; margin-top: 0mm; }
@@ -146,7 +156,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-12 print-container">
-            <div class="callout callout-info no-print" style="margin-bottom: 20px;">
+            <div class="callout callout-info no-print" style="margin-top: 20px; margin-bottom: 20px;">
               <h5><i class="fa fa-info"></i> &nbsp; Catatan :</h5>
                Pastikan anda telah menginput semua inputan Surat Usulan RKA terlebih dulu sebelum menekan tombol 🖨️ Print/Simpan pdf.
             </div>

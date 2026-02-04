@@ -72,6 +72,46 @@
     filter: brightness(1.05);
     color: #fff;
   }
+    @media (min-width: 992px) {
+    .modal-xl {
+      width: 90%;
+      max-width: 1200px;
+    }
+  }
+
+  /* Enhanced Table & Text Truncation */
+  .cell-text-limit {
+    max-width: 220px;
+    display: -webkit-box;
+    --webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 2px;
+  }
+  .table-modern thead th {
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    color: white;
+    vertical-align: middle;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 15px;
+  }
+  .table-modern tbody td {
+    vertical-align: top;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .table-modern tbody tr:hover {
+    background-color: #f8faff !important;
+  }
+
   .btn-icon-action {
     width: 34px;
     height: 34px;
@@ -194,11 +234,14 @@
             <table
               id="tabelSuratTelaahan"
               class="table table-modern"
-              style="width: 100%;"
+              style="width: 100%; border-collapse: separate; border-spacing: 0"
             >
               <thead>
                 <tr>
-                  <th width="5%">
+                  <th 
+                  class="text-center"
+                  width="5%"
+                  style="border-radius: 10px 0 0 10px;">
                     No.
                   </th>
                   <th width="12%">Detail Surat</th>
@@ -208,7 +251,8 @@
                   <th class="text-center" width="6%">Unit</th>
                   <th
                     class="text-center"
-                    width="10%">
+                    width="10%"
+                    style="border-radius: 0 10px 10px 0">
                     Aksi
                   </th>
                 </tr>

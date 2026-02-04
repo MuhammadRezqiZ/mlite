@@ -1352,11 +1352,25 @@ class Admin extends AdminModule
 
         $rows = $q->toArray();
 
-        return $this->draw('cetakusulanrba.html', [
+        echo $this->draw('cetakusulanrba.html', [
           'usulanrba' => $rows,
           'rba'  => $rba,
           'pptk'  => $pptk,
+          'ttd_files' => (function() {
+            $ttd_files = [];
+            $ttd_path = __DIR__ . '/img/ttd/';
+            if (is_dir($ttd_path)) {
+              $files = scandir($ttd_path);
+              foreach ($files as $file) {
+                if ($file !== '.' && $file !== '..') {
+                  $ttd_files[] = $file;
+                }
+              }
+            }
+            return $ttd_files;
+          })(),
         ]);
+        exit();
       }
 
       if ($id_usulanrba !== null) {
@@ -1591,7 +1605,7 @@ class Admin extends AdminModule
 
         $rows = $q->toArray();
 
-        return $this->draw('cetakusulanbukbel.html', [
+        echo $this->draw('cetakusulanbukbel.html', [
           'usulanbukbel' => $rows,
           'rba'  => $rba,
           'pptk'  => $pptk,
@@ -1609,6 +1623,7 @@ class Admin extends AdminModule
             return $ttd_files;
           })(),
         ]);
+        exit();
       }
 
       if ($id_bukbel !== null) {
@@ -1617,7 +1632,7 @@ class Admin extends AdminModule
           ->where('hosplan_bukbel.id_bukbel', '=', (int)$id_bukbel)
           ->toArray();
 
-        return $this->draw('cetakusulanbukbel.html', [
+        echo $this->draw('cetakusulanbukbel.html', [
           'usulanbukbel' => $usulanbukbel,
           'rba'  => $rba,
           'pptk'  => $pptk,
@@ -1635,6 +1650,7 @@ class Admin extends AdminModule
             return $ttd_files;
           })(),
         ]);
+        exit();
       }
     }
 
@@ -1697,7 +1713,38 @@ class Admin extends AdminModule
           ]);
 
       $rebel = isset($_GET['rebel']) ? $_GET['rebel'] : '';
+      
       redirect(url([ADMIN, 'hosplan', 'rebel'], ['rebel' => $rebel]));
+    }
+
+    public function postAjaxUpdateRebel()
+    {
+      $id_rebel = $_POST['id'];
+      $field = $_POST['field'];
+      $value = $_POST['value'];
+
+      // Validate field name
+      $allowed_fields = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
+      if (!in_array($field, $allowed_fields)) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid field']);
+        exit;
+      }
+
+      // Remove non-numeric characters (assuming integers)
+      $clean_value = preg_replace('/[^0-9]/', '', $value);
+
+      $update = $this->db('hosplan_rebel')
+        ->where('id_rebel', $id_rebel)
+        ->update([
+            $field => $clean_value
+        ]);
+
+      if ($update) {
+        echo json_encode(['status' => 'success']);
+      } else {
+        echo json_encode(['status' => 'error', 'message' => 'Update failed']);
+      }
+      exit;
     }
 
     public function getDeleteRebel($id_rebel)
