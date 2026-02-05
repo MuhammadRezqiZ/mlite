@@ -1,0 +1,58 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+          Data Permintaan Perbaikan
+        </h3>
+        <ul class="nav nav-tabs">
+            <li class="active">
+                <a href="{?=url([ADMIN,'inventaris','dataaset'])?}" role="tab">Data Perbaikan</a>
+            </li>
+            <li>
+                <a href="{?=url([ADMIN,'inventaris','permintaanperbaikanbaru'])?}" role="tab">Baru</a>
+            </li>
+        </ul>
+    </div>
+    <div class="panel-body">
+      <div class="table-responsive no-margin">
+        <table class="table table-striped no-padding dataTables" width="100%">
+          <thead>
+            <tr>
+              <th>No. Permintaan</th>
+              <th>No. Inventaris</th>
+              <th>Nama Aset/Barang</th>
+              <th>Pemohon Perbaikan</th>
+              <th>Tanggal Permintaan</th>
+              <th>Deskripsi Kerusakan</th>
+              <th>Status</th>
+              <th>Petugas</th>
+              <th>Berkas</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loop: $perbaikan}
+            <tr>
+              <td>{$value.no_permintaan}</td>
+              <td>{$value.no_inventaris}</td>
+              <td>{$value.nama_barang} [{$value.nama_merk}] - {$value.nama_ruang}</td>
+              <td>{$value.nik} - {$value.nama}</td>
+              <td>{$value.tanggal}</td>
+              <td>{$value.deskripsi_kerusakan}</td>
+              <td class="text-{if: $value.status_perbaikan == 'Sudah'}primary{else}danger{/if}">{$value.status_perbaikan}</td>
+              <td>{$value.nama_petugas}</td>
+              <td>{if: $value.status_perbaikan == 'Sudah'}
+                <a href="{?=url([ADMIN, 'inventaris', 'lembarperbaikan', $value.no_permintaan])?}" class="btn btn-xs btn-success">
+                  <i class="fa fa-print"></i><span class="hidden-xs"> Lembar Perbaikan</span></a>{/if}
+              </td>
+              <td>
+                <a href="{$value.tampil}" class="btn btn-xs btn-primary"><i class="fa fa-search"></i> Tampil</a>
+                <a href="{$value.ubah}" class="btn btn-xs btn-info"><i class="fa fa-edit"></i> Ubah</a>
+                <a href="{$value.hapus}" class="btn btn-xs btn-danger" data-confirm="Anda yakin akan menghapus data ini?"><i class="fa fa-trash"></i> Hapus</a>
+              </td>
+            </tr>
+            {/loop}
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>

@@ -3990,7 +3990,7 @@ class Admin extends AdminModule
 
       $sub_modules = [
         ['name' => 'Konfirmasi Usulan RKA', 'url' => url([ADMIN, 'hosplan', 'konfirmasiusulanrkaedit']), 'icon' => 'clipboard', 'desc' => 'Konfirmasi Data Usulan RKA', 'badge' => (is_array($pendingRKA) ? count($pendingRKA) : 0)],
-        ['name' => 'Konfirmasi Usulan RBA', 'url' => url([ADMIN, 'hosplan', 'konfirmasiusulanrbasedit']), 'icon' => 'clipboard', 'desc' => 'Konfirmasi Data Usulan RBA', 'badge' => (is_array($pendingRBA) ? count($pendingRBA) : 0)],
+        ['name' => 'Konfirmasi Usulan RBA', 'url' => url([ADMIN, 'hosplan', 'konfirmasiusulanrbaedit']), 'icon' => 'clipboard', 'desc' => 'Konfirmasi Data Usulan RBA', 'badge' => (is_array($pendingRBA) ? count($pendingRBA) : 0)],
         ['name' => 'Konfirmasi Usulan BukBel', 'url' => url([ADMIN, 'hosplan', 'konfirmasiusulanbukbeledit']), 'icon' => 'book', 'desc' => 'Konfirmasi Data Usulan Buku Belanja', 'badge' => (is_array($pendingBukbel) ? count($pendingBukbel) : 0)],
       ];
 
@@ -4171,7 +4171,7 @@ class Admin extends AdminModule
         $query->where('hosplan_uploadrba.id_pptk', $selectedPptk);
       }
       // Hanya tampilkan status "Diajukan" pada halaman konfirmasi
-      $query->where('hosplan_status.status_surat', 'Diajukan');
+      // $query->where('hosplan_status.status_surat', 'Diajukan');
 
       $tabel_uploadusulanrba = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
@@ -4309,7 +4309,7 @@ class Admin extends AdminModule
         $query->where('hosplan_uploadbukbel.id_pptk', $selectedPptk);
       }
       // Hanya tampilkan status "Diajukan" pada halaman konfirmasi
-      $query->where('hosplan_status.status_surat', 'Diajukan');
+      // $query->where('hosplan_status.status_surat', 'Diajukan');
 
       $tabel_uploadusulanbukbel = $query->toArray();
       // Bangun URL file lampiran dengan fallback lokasi lama
@@ -4338,7 +4338,7 @@ class Admin extends AdminModule
       $totalKonfirmasiBukbel = $totalUploadBukbel;
       $isUnitSelected = ($selectedPptk !== 'all' && is_int($selectedPptk) && $selectedPptk > 0);
 
-      return $this->draw('konfirmasiusulanbukbel.html', [
+      return $this->draw('konfirmasiusulanbukbeledit.html', [
         'tabel_uploadusulanbukbel' => $tabel_uploadusulanbukbel,
         'jenis' => $jenis,
         'status' => $status,
